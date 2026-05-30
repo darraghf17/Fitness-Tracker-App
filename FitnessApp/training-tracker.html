@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Training Tracker</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ─── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-tap-highlight-color: transparent; }
+
+    /* ─── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --bg:           #f7f9f7;
+      --card:         #ffffff;
+      --primary:      #4a7c59;
+      --primary-lt:   #e8f2ec;
+      --amber:        #f5a623;
+      --danger:       #e74c3c;
+      --success:      #27ae60;
+      --text:         #1a1a1a;
+      --text-sec:     #6b7280;
+      --border:       #e5e7eb;
+      --shadow:       0 2px 12px rgba(0,0,0,0.07);
+      --radius-card:  16px;
+      --radius-btn:   12px;
+      --radius-input: 10px;
+      --radius-badge: 8px;
+      --transition:   0.2s ease;
+      --nav-h:        68px;
+    }
+
+    /* ─── BASE ───────────────────────────────────────────────────── */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────────── */
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      min-height: 100dvh;
+    }
+
+    .screen {
+      display: none;
+      padding: 20px 16px calc(var(--nav-h) + 20px);
+      min-height: 100dvh;
+      animation: fadeIn 0.18s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── CARDS ──────────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 24px;
+      border-radius: var(--radius-btn);
+      min-height: 44px;
+      transition: opacity var(--transition), transform var(--transition);
+      text-decoration: none;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.88; }
+
+    .btn-primary   { background: var(--primary);    color: #fff; }
+    .btn-secondary { background: var(--primary-lt); color: var(--primary); }
+    .btn-amber     { background: var(--amber);       color: #fff; }
+    .btn-danger    { background: var(--danger);      color: #fff; }
+    .btn-full      { width: 100%; }
+    .btn-sm        { font-size: 13px; padding: 8px 16px; }
+
+    /* ─── INPUTS ─────────────────────────────────────────────────── */
+    input, select, textarea {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-input);
+      padding: 10px 14px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--text);
+      width: 100%;
+      outline: none;
+      transition: border-color var(--transition);
+      min-height: 44px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 18px;
+      padding-right: 40px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sec);
+      margin-bottom: 6px;
+    }
+    .form-group { margin-bottom: 14px; }
+
+    /* ─── BADGES ─────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-badge);
+      white-space: nowrap;
+    }
+    .badge-staple {
+      background: #fff3e0;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+    .badge-progress {
+      background: var(--primary-lt);
+      color: var(--primary);
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    .badge-stall {
+      background: #fff8e1;
+      color: var(--amber);
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    .badge-locked {
+      background: #f3f4f6;
+      color: var(--text-sec);
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    /* ─── CAUTION ────────────────────────────────────────────────── */
+    .caution-icon {
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 16px;
+      min-width: 28px;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .caution-text {
+      font-size: 13px;
+      color: var(--danger);
+      background: #fdf2f2;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 6px;
+      display: none;
+    }
+    .caution-text.open { display: block; }
+
+    /* ─── LOCKED ROW ─────────────────────────────────────────────── */
+    .row-locked { opacity: 0.45; pointer-events: none; }
+
+    /* ─── SECTION HEADER ─────────────────────────────────────────── */
+    .screen-header {
+      margin-bottom: 20px;
+      padding-top: 8px;
+    }
+    .screen-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .screen-header p {
+      font-size: 14px;
+      color: var(--text-sec);
+      margin-top: 2px;
+    }
+
+    /* ─── PLACEHOLDER BLOCKS ─────────────────────────────────────── */
+    .placeholder-block {
+      background: var(--primary-lt);
+      border: 2px dashed var(--primary);
+      border-radius: var(--radius-card);
+      padding: 28px 20px;
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .placeholder-block i {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+      opacity: 0.7;
+    }
+    .placeholder-block h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .placeholder-block p {
+      font-size: 13px;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    /* ─── DIVIDER ────────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* ─── STAT BOXES ─────────────────────────────────────────────── */
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-box {
+      flex: 1;
+      background: var(--primary-lt);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-box .val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+    .stat-box .lbl {
+      font-size: 11px;
+      color: var(--text-sec);
+      font-weight: 600;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    /* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: var(--nav-h);
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 8px 2px 10px;
+      position: relative;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-tab i {
+      font-size: 17px;
+      color: var(--text-sec);
+      transition: color var(--transition), transform var(--transition);
+    }
+    .nav-tab .nav-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-sec);
+      letter-spacing: 0.02em;
+      transition: color var(--transition);
+      white-space: nowrap;
+    }
+    .nav-tab .nav-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      transition: transform var(--transition);
+    }
+
+    .nav-tab.active i         { color: var(--primary); transform: translateY(-1px); }
+    .nav-tab.active .nav-label { color: var(--primary); }
+    .nav-tab.active .nav-dot  { transform: translateX(-50%) scale(1); }
+
+    /* ─── SCROLLBAR (desktop only) ───────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ─── DASHBOARD ──────────────────────────────────────────────── */
+    .dash-greeting {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 16px;
+      padding-top: 8px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary) 0%, #3a6347 100%);
+      color: #fff;
+      padding: 22px 20px 20px;
+    }
+    .hero-date {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.8;
+      margin-bottom: 6px;
+    }
+    .hero-block {
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero-countdown {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.18);
+      border-radius: 20px;
+      display: inline-block;
+      padding: 4px 12px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .cta-card {
+      flex: 1;
+      border: none;
+      border-radius: var(--radius-card);
+      padding: 22px 12px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), opacity var(--transition);
+    }
+    .cta-card:active { transform: scale(0.96); opacity: 0.88; }
+    .cta-card i { font-size: 28px; }
+    .cta-gym      { background: var(--primary); color: #fff; }
+    .cta-mobility { background: var(--amber);   color: #fff; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 10px;
+      padding-top: 4px;
+    }
+
+    .streak-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .streak-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .streak-gym { background: var(--primary-lt); color: var(--primary); }
+    .streak-mob { background: #fff8e6; color: #c47d00; }
+
+    .last-sessions-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .last-session-card { flex: 1; margin-bottom: 0; }
+    .session-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .session-val { font-size: 15px; font-weight: 700; color: var(--text); }
+    .session-sub { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+
+    .overload-alert {
+      background: #f0faf3;
+      border: 2px solid var(--success);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .overload-alert i { color: var(--success); font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+    .overload-exname { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .overload-cta    { font-size: 13px; color: var(--success); font-weight: 600; }
+
+    /* ─── SETTINGS ───────────────────────────────────────────────── */
+    .block-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .block-pill-label { margin: 0; }
+    .block-pill-label input[type="radio"] { display: none; }
+    .block-pill {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sec);
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .block-pill-label input[type="radio"]:checked + .block-pill {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .toggle-info { flex: 1; }
+    .toggle-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .toggle-sub   { font-size: 13px; color: var(--text-sec); margin-top: 2px; }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+      cursor: pointer;
+      margin: 0;
+    }
+    .toggle-switch input { display: none; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #d1d5db;
+      border-radius: 15px;
+      transition: background 0.25s;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.25s;
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--success); }
+    .toggle-switch input:checked + .toggle-track::after { transform: translateX(22px); }
+
+    .rationale-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+    }
+    #rationale-chevron {
+      color: var(--text-sec);
+      font-size: 13px;
+      transition: transform var(--transition);
+    }
+    .rationale-toggle.open #rationale-chevron { transform: rotate(180deg); }
+
+    /* ─── GYM LOGGER ─────────────────────────────────────────────── */
+    input[type="range"] {
+      -webkit-appearance: auto; appearance: auto;
+      background: var(--border); border: none; padding: 0;
+      height: 6px; min-height: 6px; border-radius: 3px; cursor: pointer;
+    }
+    input[type="range"].red-range   { accent-color: var(--danger); }
+    input[type="range"].green-range { accent-color: var(--success); }
+
+    .slider-group { margin-bottom: 16px; }
+    .slider-label-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .slider-lbl { font-size:13px; font-weight:600; color:var(--text-sec); }
+    .slider-val { font-size:13px; font-weight:700; padding:2px 10px; border-radius:20px; min-width:36px; text-align:center; }
+    .slider-val.red   { background:#fdf2f2; color:var(--danger); }
+    .slider-val.green { background:#f0faf3; color:var(--success); }
+    .slider-ticks { display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec); margin-top:3px; }
+
+    .zone2-card { background:#eff6ff; border:2px solid #3b82f6; }
+    .zone2-ttl  { font-size:14px; font-weight:700; color:#1d4ed8; margin-bottom:4px; }
+    .zone2-sub  { font-size:12px; color:#3b82f6; margin-bottom:12px; }
+    .zone2-fields { display:flex; gap:10px; margin-bottom:12px; }
+    .zone2-fields .form-group { flex:1; margin-bottom:0; }
+    .mod-row { display:flex; gap:8px; margin-top:4px; }
+    .mod-pill {
+      flex:1; padding:8px 4px; border-radius:8px;
+      border:2px solid var(--border); background:#fff;
+      font-size:13px; font-weight:600; color:var(--text-sec);
+      cursor:pointer; text-align:center; font-family:inherit;
+      transition: all var(--transition);
+    }
+    .mod-pill.active { background:#dbeafe; border-color:#3b82f6; color:#1d4ed8; }
+
+    .ex-card { margin-bottom: 14px; }
+    .ex-header { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+    .ex-name   { font-size:15px; font-weight:700; color:var(--text); }
+    .ex-cue    { font-size:12px; color:var(--text-sec); line-height:1.5; margin-bottom:6px; }
+    .ex-last   { font-size:12px; color:var(--text-sec); font-style:italic; margin-bottom:10px; }
+
+    .set-rows { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+    .set-row  { display:flex; align-items:center; gap:6px; }
+    .set-lbl  { font-size:12px; font-weight:700; color:var(--text-sec); min-width:38px; flex-shrink:0; }
+    .set-row select {
+      flex:1; font-size:13px; padding:7px 28px 7px 8px;
+      min-height:38px; background-size:14px; background-position:right 6px center;
+    }
+    .set-row input[type="number"] {
+      flex:1; font-size:13px; padding:7px 8px; min-height:38px;
+    }
+    .ex-notes { font-size:14px; padding:8px 12px; min-height:56px; resize:vertical; }
+    .complete-wrap { padding:16px 0 8px; }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 1 — DASHBOARD
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-home" class="screen active">
+
+    <div class="dash-greeting"><span id="dash-greeting-text">Hi, Darragh</span></div>
+
+    <!-- Hero Card -->
+    <div class="card hero-card">
+      <div class="hero-date" id="hero-date"></div>
+      <div class="hero-block" id="hero-block"></div>
+      <div class="hero-countdown" id="hero-countdown"></div>
+    </div>
+
+    <!-- CTA Row -->
+    <div class="cta-row">
+      <button class="cta-card cta-gym" onclick="navigateTo('screen-gym')">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>Log Gym Session</span>
+      </button>
+      <button class="cta-card cta-mobility" onclick="navigateTo('screen-mobility')">
+        <i class="fa-solid fa-person-running"></i>
+        <span>Log Mobility</span>
+      </button>
+    </div>
+
+    <!-- Streaks -->
+    <div class="card">
+      <div class="card-title">Streaks</div>
+      <div class="streak-row">
+        <span class="streak-pill streak-gym" id="gym-streak">🔥 0 gym</span>
+        <span class="streak-pill streak-mob" id="mob-streak">🔥 0 mobility</span>
+      </div>
+    </div>
+
+    <!-- Last Sessions -->
+    <div class="section-label">Last Sessions</div>
+    <div class="last-sessions-row">
+      <div class="card last-session-card">
+        <div class="session-label">Gym</div>
+        <div id="last-gym-value"><div class="session-val" style="color:var(--text-sec)">No sessions yet</div></div>
+      </div>
+      <div class="card last-session-card">
+        <div class="session-label">Mobility</div>
+        <div id="last-mob-value"><div class="session-val" style="color:var(--text-sec)">No sessions yet</div></div>
+      </div>
+    </div>
+
+    <!-- Overload Alerts -->
+    <div id="overload-section" style="display:none">
+      <div class="section-label">Progression Ready</div>
+      <div id="overload-list"></div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 2 — GYM LOGGER
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-gym" class="screen">
+    <div class="screen-header">
+      <h1 id="gym-screen-title">Gym Logger</h1>
+      <p id="gym-screen-sub">Loading today's session…</p>
+    </div>
+
+    <!-- Check-in -->
+    <div class="card">
+      <div class="card-title">Check-in</div>
+      <div class="slider-group">
+        <div class="slider-label-row">
+          <span class="slider-lbl">Foot pain</span>
+          <span class="slider-val red" id="pain-val">5</span>
+        </div>
+        <input type="range" class="red-range" id="pain-slider" min="0" max="10" value="5" />
+        <div class="slider-ticks"><span>0 — None</span><span>10 — Severe</span></div>
+      </div>
+      <div class="slider-group" style="margin-bottom:0">
+        <div class="slider-label-row">
+          <span class="slider-lbl">Sleep / Energy</span>
+          <span class="slider-val green" id="energy-val">3</span>
+        </div>
+        <input type="range" class="green-range" id="energy-slider" min="1" max="5" value="3" />
+        <div class="slider-ticks"><span>1 — Exhausted</span><span>5 — Great</span></div>
+      </div>
+    </div>
+
+    <!-- Zone 2 Logger (engine days only) -->
+    <div class="card zone2-card" id="gym-zone2-card" style="display:none">
+      <div class="zone2-ttl"><i class="fa-solid fa-heart-pulse"></i> Zone 2 Cardio</div>
+      <div class="zone2-sub">Target: 35 min · 119–139 bpm</div>
+      <div class="zone2-fields">
+        <div class="form-group">
+          <label for="z2-duration">Duration</label>
+          <select id="z2-duration"></select>
+        </div>
+        <div class="form-group">
+          <label for="z2-hr">Avg HR (bpm)</label>
+          <input type="number" id="z2-hr" min="60" max="220" placeholder="130" />
+        </div>
+      </div>
+      <label style="margin-bottom:6px">Modality</label>
+      <div class="mod-row" id="z2-modality">
+        <button class="mod-pill active" data-mod="Bike">Bike</button>
+        <button class="mod-pill" data-mod="Ski Erg">Ski Erg</button>
+        <button class="mod-pill" data-mod="Rower">Rower</button>
+      </div>
+    </div>
+
+    <!-- Exercise cards injected by JS -->
+    <div id="gym-exercise-list"></div>
+
+    <div class="complete-wrap">
+      <button class="btn btn-full" id="btn-complete-session" style="background:var(--success);color:#fff;font-size:16px;padding:16px;border-radius:var(--radius-btn)">
+        <i class="fa-solid fa-check-circle"></i> Complete Session
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 3 — MOBILITY LOGGER
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-mobility" class="screen">
+    <div class="screen-header">
+      <h1>Mobility Logger</h1>
+      <p>Track stretches, drills &amp; warm-up work</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-person-running"></i>
+      <h3>Routine Selector</h3>
+      <p>Choose a pre-built mobility routine (Morning, Pre-Lift, Post-Lift, Recovery) or build a custom flow for the day.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-stopwatch"></i>
+      <h3>Drill Logger</h3>
+      <p>Each drill: movement name, duration (seconds) or reps, side (bilateral / left / right), and a comfort-scale rating 1–5. CAUTION notes expandable inline.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-chart-simple"></i>
+      <h3>Mobility Trends</h3>
+      <p>Weekly completion ring and comfort-score trends per body area (hips, shoulders, thoracic, ankles) will appear here.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 4 — BENCHMARKS
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-progress" class="screen">
+    <div class="screen-header">
+      <h1>Benchmarks</h1>
+      <p>Track your key lifts and performance goals</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-chart-line"></i>
+      <h3>Lift Progress Charts</h3>
+      <p>Chart.js line charts per benchmark exercise showing weight / estimated 1RM over time. Toggle between 4 weeks, 3 months, and all time.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-trophy"></i>
+      <h3>Personal Records</h3>
+      <p>All-time PRs per exercise: 1RM, 3RM, 5RM, max volume in a single session. Highlighted in gold when recently broken.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-bullseye"></i>
+      <h3>Goal Targets</h3>
+      <p>Set a target weight or rep count for any lift. A progress bar and ETA estimate based on current rate of progression will display here.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 5 — OVERLOAD TRACKING
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-overload" class="screen">
+    <div class="screen-header">
+      <h1>Overload Tracking</h1>
+      <p>Progressive overload decisions for every lift</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-arrow-trend-up"></i>
+      <h3>Overload Table</h3>
+      <p>One row per tracked exercise. Columns: name, current load, last 3 sessions, trend arrow, and a status badge — ↑ PROGRESSION READY, ⚠ STALL ALERT, or ON TRACK.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-sliders"></i>
+      <h3>Overload Rules</h3>
+      <p>Per-exercise config: minimum sets at target reps before increasing load, step-up increment (kg/lbs), deload trigger (e.g. 3 consecutive stalls).</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <h3>Overload History</h3>
+      <p>Timeline of every weight or rep increase with date and session notes. Export as CSV in a future build.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 6 — COACH REPORT
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-report" class="screen">
+    <div class="screen-header">
+      <h1>Coach Report</h1>
+      <p>Auto-generated weekly summary for your coach</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-file-lines"></i>
+      <h3>Weekly Summary</h3>
+      <p>Auto-compiled report: sessions completed, key lifts with loads and sets, PRs hit, stalls flagged, mobility compliance percentage, and any session notes you added.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <h3>Custom Notes</h3>
+      <p>Free-text field to add context for your coach before sending: fatigue level, injuries, life stress rating 1–10.</p>
+    </div>
+
+    <div class="placeholder-block">
+      <i class="fa-solid fa-share-nodes"></i>
+      <h3>Export &amp; Share</h3>
+      <p>Copy as plain text or Markdown, or open in the native share sheet. Formatted for easy pasting into WhatsApp or email.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 7 — SETTINGS
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-settings" class="screen">
+    <div class="screen-header">
+      <h1>Settings</h1>
+      <p>Configure your tracker</p>
+    </div>
+
+    <!-- Athlete Profile -->
+    <div class="card">
+      <div class="card-title">Athlete Profile</div>
+      <div class="form-group" style="margin-bottom:0">
+        <label for="sett-name">Your name</label>
+        <input type="text" id="sett-name" placeholder="Darragh Fallon" />
+      </div>
+    </div>
+
+    <!-- Programme -->
+    <div class="card">
+      <div class="card-title">Programme</div>
+      <div class="form-group">
+        <label>Current block</label>
+        <div class="block-pills">
+          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 1"><span class="block-pill">Block 1</span></label>
+          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 2A"><span class="block-pill">Block 2A</span></label>
+          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 2B"><span class="block-pill">Block 2B</span></label>
+          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 3"><span class="block-pill">Block 3</span></label>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label for="sett-block-start">Block start date</label>
+        <input type="date" id="sett-block-start" />
+      </div>
+    </div>
+
+    <!-- Physio Clearance -->
+    <div class="card">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Physio cleared</div>
+          <div class="toggle-sub">Unlock post-9-June exercises</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sett-physio" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Coach Report -->
+    <div class="card">
+      <div class="card-title">Coach Report</div>
+      <div class="form-group" style="margin-bottom:0">
+        <label for="sett-report-date">Last report date</label>
+        <input type="date" id="sett-report-date" />
+      </div>
+    </div>
+
+    <!-- Data & Backup -->
+    <div class="card">
+      <div class="card-title">Data &amp; Backup</div>
+      <button class="btn btn-secondary btn-full" id="btn-export" style="margin-bottom:10px">
+        <i class="fa-solid fa-download"></i>&nbsp; Export data as JSON
+      </button>
+      <label class="btn btn-secondary btn-full" style="cursor:pointer;margin-bottom:0">
+        <i class="fa-solid fa-upload"></i>&nbsp; Import data from JSON
+        <input type="file" id="sett-import" accept=".json" style="display:none" />
+      </label>
+    </div>
+
+    <!-- Programme Rationale -->
+    <div class="card">
+      <button class="rationale-toggle" id="rationale-toggle">
+        <span>Programme rationale</span>
+        <i class="fa-solid fa-chevron-down" id="rationale-chevron"></i>
+      </button>
+      <div id="rationale-body" style="display:none">
+        <div class="divider"></div>
+        <p id="rationale-text" style="font-size:14px;color:var(--text-sec);line-height:1.7"></p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       BOTTOM NAVIGATION
+  ══════════════════════════════════════════════════════════════ -->
+  <nav id="bottom-nav">
+    <button class="nav-tab active" data-target="screen-home">
+      <i class="fa-solid fa-house"></i>
+      <span class="nav-label">Home</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-gym">
+      <i class="fa-solid fa-dumbbell"></i>
+      <span class="nav-label">Gym</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-mobility">
+      <i class="fa-solid fa-person-running"></i>
+      <span class="nav-label">Mobility</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-progress">
+      <i class="fa-solid fa-chart-line"></i>
+      <span class="nav-label">Progress</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-overload">
+      <i class="fa-solid fa-arrow-trend-up"></i>
+      <span class="nav-label">Overload</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-report">
+      <i class="fa-solid fa-file-lines"></i>
+      <span class="nav-label">Report</span>
+      <span class="nav-dot"></span>
+    </button>
+    <button class="nav-tab" data-target="screen-settings">
+      <i class="fa-solid fa-gear"></i>
+      <span class="nav-label">Settings</span>
+      <span class="nav-dot"></span>
+    </button>
+  </nav>
+
+</div><!-- /#app -->
+
+<script>
+  /* ─── BLOCK DATA ──────────────────────────────────────────────── */
+  const BLOCK_SCHEDULES = {
+    'Block 1':  { Mon:'Upper A', Tue:'Engine + Lower', Wed:'Upper B', Thu:'Engine + Prehab', Fri:'Upper C', Sat:'Rest', Sun:'Rest' },
+    'Block 2A': { Mon:'Upper A', Tue:'Lower',          Wed:'Upper B', Thu:'Engine + Prehab', Fri:'Upper C', Sat:'Rest', Sun:'Rest' },
+    'Block 2B': { Mon:'Upper A', Tue:'Engine + Lower', Wed:'Upper B', Thu:'Engine + Prehab', Fri:'Upper C', Sat:'Rest', Sun:'Rest' },
+    'Block 3':  { Mon:'Upper A', Tue:'Lower',          Wed:'Upper B', Thu:'Engine + Prehab + Climbing', Fri:'Upper C + Climbing', Sat:'Rest', Sun:'Rest' },
+  };
+
+  const BLOCK_AUTO_RANGES = [
+    { name:'Block 1',  from:'2026-05-30', to:'2026-06-08' },
+    { name:'Block 2A', from:'2026-06-09', to:'2026-07-26' },
+    { name:'Block 3',  from:'2026-07-27', to:'2026-09-10' },
+  ];
+
+  const PROGRAMME_RATIONALE = {
+    'Block 1':  'Block 1 (30 May – 8 June) is your re-introduction phase. Volume is moderate and technique is the priority. All three upper-body days give you frequency to re-groove movement patterns after your physio break. Engine + Lower on Tuesday maintains conditioning without overloading the lower body. Target 70–80% perceived effort throughout.',
+    'Block 2A': 'Block 2A (9 June – 26 July) removes the Engine component from Tuesday to reduce fatigue accumulation as volume ramps. This block is cleared post-physio-clearance. Focus on progressive overload across the main compound lifts, targeting 2–3 sets within your rep range before stepping load.',
+    'Block 2B': 'Block 2B (9 June – 26 July) maintains the full Engine + Lower structure from Block 1 with a higher intensity target. Recommended if physio clearance has not yet been granted. Emphasis on consistent form under fatigue, particularly on lower body movements.',
+    'Block 3':  'Block 3 (27 July – 10 Sept) integrates climbing-specific preparation into the programme. Thursday and Friday sessions include rotator cuff, antagonist balance, and grip/finger prehab work. Volume tapers in the final two weeks as you approach the 10 September target date.',
+  };
+
+  /* ─── STORAGE KEYS ──────────────────────────────────────────────── */
+  const KEY_SETTINGS = 'tt_settings';
+  const KEY_GYM      = 'tt_gym_sessions';
+  const KEY_MOB      = 'tt_mob_sessions';
+
+  /* ─── SETTINGS ──────────────────────────────────────────────────── */
+  const SETTING_DEFAULTS = {
+    athleteName: 'Darragh Fallon',
+    block: '',
+    blockStartDate: '',
+    physioCleared: false,
+    lastReportDate: '',
+  };
+
+  function loadSettings() {
+    try { return { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem(KEY_SETTINGS) || '{}') }; }
+    catch { return { ...SETTING_DEFAULTS }; }
+  }
+
+  function saveSettings(patch) {
+    const updated = { ...loadSettings(), ...patch };
+    localStorage.setItem(KEY_SETTINGS, JSON.stringify(updated));
+    return updated;
+  }
+
+  /* ─── SESSION DATA ──────────────────────────────────────────────── */
+  function loadSessions(key) {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
+  }
+
+  /* ─── HELPERS ───────────────────────────────────────────────────── */
+  function toDateStr(d) { return d.toISOString().slice(0, 10); }
+
+  function getAutoBlock(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    for (const b of BLOCK_AUTO_RANGES) {
+      if (d >= new Date(b.from + 'T00:00:00') && d <= new Date(b.to + 'T23:59:59')) return b.name;
+    }
+    return 'Block 1';
+  }
+
+  function getDayType(blockName, date) {
+    const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const schedule = BLOCK_SCHEDULES[blockName] || BLOCK_SCHEDULES['Block 1'];
+    return schedule[DAY[date.getDay()]] || 'Rest';
+  }
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T00:00:00');
+    const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]}`;
+  }
+
+  function calcStreak(sessions) {
+    if (!sessions.length) return 0;
+    const uniqueDates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort().reverse();
+    if (!uniqueDates.length) return 0;
+    const today     = toDateStr(new Date());
+    const yesterday = toDateStr(new Date(Date.now() - 86400000));
+    if (uniqueDates[0] !== today && uniqueDates[0] !== yesterday) return 0;
+    let cursor = new Date(uniqueDates[0] + 'T00:00:00');
+    let streak = 0;
+    for (const d of uniqueDates) {
+      if (d === toDateStr(cursor)) { streak++; cursor = new Date(cursor.getTime() - 86400000); }
+      else break;
+    }
+    return streak;
+  }
+
+  /* ─── NAVIGATION ────────────────────────────────────────────────── */
+  function navigateTo(screenId) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const tab = document.querySelector(`.nav-tab[data-target="${screenId}"]`);
+    if (tab) tab.classList.add('active');
+    const scr = document.getElementById(screenId);
+    if (scr) scr.classList.add('active');
+    if (screenId === 'screen-gym') renderGymLogger();
+  }
+
+  /* ─── DASHBOARD RENDER ──────────────────────────────────────────── */
+  function renderDashboard() {
+    const settings = loadSettings();
+    const today    = new Date();
+    const todayStr = toDateStr(today);
+
+    const firstName  = (settings.athleteName || 'Darragh Fallon').split(' ')[0];
+    const hr         = today.getHours();
+    const salutation = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('dash-greeting-text').textContent = `${salutation}, ${firstName}`;
+
+    const blockName = settings.block || getAutoBlock(todayStr);
+    const dayType   = getDayType(blockName, today);
+    const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    document.getElementById('hero-date').textContent  = `${DAYS[today.getDay()]}, ${today.getDate()} ${MONTHS[today.getMonth()]} ${today.getFullYear()}`;
+    document.getElementById('hero-block').textContent = `${blockName} — ${dayType}`;
+    const daysLeft = Math.max(0, Math.ceil((new Date('2026-09-10T23:59:59') - today) / 86400000));
+    document.getElementById('hero-countdown').textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} until 10 Sept 2026`;
+
+    const gymSessions = loadSessions(KEY_GYM);
+    const mobSessions = loadSessions(KEY_MOB);
+    document.getElementById('gym-streak').textContent = `🔥 ${calcStreak(gymSessions)} gym`;
+    document.getElementById('mob-streak').textContent = `🔥 ${calcStreak(mobSessions)} mobility`;
+
+    const lastGym = gymSessions.length ? gymSessions[gymSessions.length - 1] : null;
+    const lastMob = mobSessions.length ? mobSessions[mobSessions.length - 1] : null;
+
+    const gymEl = document.getElementById('last-gym-value');
+    const mobEl = document.getElementById('last-mob-value');
+    gymEl.innerHTML = lastGym
+      ? `<div class="session-val">${formatDisplayDate(lastGym.date)}</div><div class="session-sub">${lastGym.dayType || '—'}</div>`
+      : `<div class="session-val" style="color:var(--text-sec)">No sessions yet</div>`;
+    mobEl.innerHTML = lastMob
+      ? `<div class="session-val">${formatDisplayDate(lastMob.date)}</div><div class="session-sub">${lastMob.routine || 'General'}</div>`
+      : `<div class="session-val" style="color:var(--text-sec)">No sessions yet</div>`;
+
+    const alerts = (lastGym && lastGym.progressionAlerts) ? lastGym.progressionAlerts : [];
+    const alertsSection = document.getElementById('overload-section');
+    const alertsList    = document.getElementById('overload-list');
+    if (alerts.length) {
+      alertsSection.style.display = 'block';
+      alertsList.innerHTML = alerts.map(a => `
+        <div class="overload-alert">
+          <i class="fa-solid fa-arrow-trend-up"></i>
+          <div>
+            <div class="overload-exname">${a.exercise}</div>
+            <div class="overload-cta">↑ Ready to add load — suggested: ${a.suggestedWeight}kg next session</div>
+          </div>
+        </div>`).join('');
+    } else {
+      alertsSection.style.display = 'none';
+    }
+  }
+
+  /* ─── SETTINGS RENDER ───────────────────────────────────────────── */
+  function renderSettings() {
+    const s = loadSettings();
+    document.getElementById('sett-name').value        = s.athleteName;
+    document.getElementById('sett-block-start').value = s.blockStartDate || '';
+    document.getElementById('sett-physio').checked    = !!s.physioCleared;
+    document.getElementById('sett-report-date').value = s.lastReportDate || '';
+    const blockVal = s.block || getAutoBlock(toDateStr(new Date()));
+    document.querySelectorAll('input[name="sett-block"]').forEach(r => { r.checked = r.value === blockVal; });
+    updateRationale(blockVal);
+  }
+
+  function updateRationale(blockName) {
+    document.getElementById('rationale-text').textContent = PROGRAMME_RATIONALE[blockName] || '';
+  }
+
+  /* ─── SETTINGS LISTENERS ────────────────────────────────────────── */
+  function initSettings() {
+    document.getElementById('sett-name').addEventListener('input', e => {
+      saveSettings({ athleteName: e.target.value });
+      renderDashboard();
+    });
+
+    document.querySelectorAll('input[name="sett-block"]').forEach(r => {
+      r.addEventListener('change', e => {
+        saveSettings({ block: e.target.value });
+        updateRationale(e.target.value);
+        renderDashboard();
+      });
+    });
+
+    document.getElementById('sett-block-start').addEventListener('change', e => {
+      saveSettings({ blockStartDate: e.target.value });
+    });
+
+    document.getElementById('sett-physio').addEventListener('change', e => {
+      saveSettings({ physioCleared: e.target.checked });
+    });
+
+    document.getElementById('sett-report-date').addEventListener('change', e => {
+      saveSettings({ lastReportDate: e.target.value });
+    });
+
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('tt_')) {
+          try { data[k] = JSON.parse(localStorage.getItem(k)); }
+          catch { data[k] = localStorage.getItem(k); }
+        }
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), { href: url, download: `training-data-${toDateStr(new Date())}.json` });
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('sett-import').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          Object.entries(data).forEach(([k, v]) => {
+            localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+          });
+          renderSettings();
+          renderDashboard();
+          alert('Data imported successfully.');
+        } catch { alert('Invalid JSON file — please check and try again.'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    const toggle  = document.getElementById('rationale-toggle');
+    const body    = document.getElementById('rationale-body');
+    toggle.addEventListener('click', () => {
+      const open = body.style.display === 'block';
+      body.style.display = open ? 'none' : 'block';
+      toggle.classList.toggle('open', !open);
+    });
+  }
+
+  /* ─── GYM LOGGER DATA ──────────────────────────────────────────── */
+  const WEIGHT_OPTS_BASE = ['BW',1,1.5,2,2.5,3,3.5,4,4.5,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+    22.5,25,27.5,30,32.5,35,37.5,40,42.5,45,47.5,50,52.5,55,57.5,60,65,70,75,80,85,90,95,100,110,120,130,140,150];
+
+  const GYM_EXERCISES = {
+    'Upper A': [
+      { id:'ua-pullup',   name:'Pull-up neutral grip',           sets:4, repRange:[3,4],   weight:'BW', type:'bw',       cue:'Full dead hang, no kip, 2-sec descent', caution:'Left middle finger A2 pulley — stop on any finger pain' },
+      { id:'ua-ext-rot',  name:'Cable external rotation',        sets:3, repRange:[12,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Elbow pinned to ribs, slow, no momentum' },
+      { id:'ua-latpd',    name:'Lat pulldown',                   sets:3, repRange:[8,10],  weight:60,   inc:2.5,  type:'weighted', cue:'Tuck elbows to ribs, no torso swing' },
+      { id:'ua-wrist',    name:'Reverse wrist curl',             sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Full range, burn in muscle belly not elbow' },
+      { id:'ua-srow',     name:'Seated cable row',               sets:3, repRange:[10,12], weight:60,   inc:2.5,  type:'weighted', cue:'Proud chest, retract scapulae, no shrug' },
+      { id:'ua-facepull', name:'Face pull',                      sets:3, repRange:[15,15], weight:17.5, inc:2.5,  type:'weighted', cue:'Pull to forehead, thumbs back' },
+      { id:'ua-deadbug',  name:'Dead bug',                       sets:3, repRange:[8,8],   weight:'BW', type:'bw',       cue:'Low back glued to floor' },
+      { id:'ua-pallof',   name:'Pallof press',                   sets:2, repRange:[10,10], weight:10,   inc:2.5,  type:'weighted', cue:'Resist rotation, ribs down' },
+    ],
+    'Engine + Lower': [
+      { id:'el-zone2',   name:'Zone 2 cardio', type:'zone2' },
+      { id:'el-hipab',   name:'Seated hip abductor',             sets:3, repRange:[15,15], weight:30,   inc:5,    type:'weighted', cue:'Glute medius, no foot loading' },
+      { id:'el-bandab',  name:'Side-lying band hip abduction',   sets:2, repRange:[15,15], weight:'BW', type:'bw',       cue:'Slow, no hip rock' },
+      { id:'el-hamcurl', name:'Lying hamstring curl',            sets:3, repRange:[10,12], weight:20,   inc:2.5,  type:'weighted', cue:'Moderate load only', caution:'Proximal hamstring tendinopathy right — keep moderate and pain-free' },
+      { id:'el-calf',    name:'Left single-leg calf raise',      sets:3, repRange:[12,12], weight:'BW', type:'bw',       cue:'Left leg only, full range, pause at top' },
+      { id:'el-plank',   name:'Forearm plank',                   sets:3, type:'timed',     weight:'BW', targetSec:30, inc:5, cue:'Hips level, no sag' },
+    ],
+    'Upper B': [
+      { id:'ub-dbrow',   name:'Single-arm DB row',               sets:4, repRange:[8,10],  weight:26,   inc:2,    type:'weighted', cue:'Brace hard, no rotation' },
+      { id:'ub-ext-rot', name:'Cable external rotation',         sets:3, repRange:[12,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Quality over load' },
+      { id:'ub-csrow',   name:'Chest-supported row',             sets:3, repRange:[10,12], weight:50,   inc:2.5,  type:'weighted', cue:'Squeeze scapulae, control the negative' },
+      { id:'ub-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Own the range' },
+      { id:'ub-adip',    name:'Assisted dip',                    sets:3, repRange:[6,8],   weight:'BW', type:'assisted', cue:'Slight forward lean, control down', caution:'Stop above pain-free depth' },
+      { id:'ub-scappu',  name:'Scapular pull-up',                sets:3, repRange:[8,10],  weight:'BW', type:'bw',       cue:'Feel lats switch on, no shrug' },
+      { id:'ub-bdog',    name:'Bird dog',                        sets:3, repRange:[8,8],   weight:'BW', type:'bw',       cue:'Slow, no hip tilt' },
+    ],
+    'Engine + Prehab': [
+      { id:'ep-zone2',   name:'Zone 2 cardio', type:'zone2' },
+      { id:'ep-ext-rot', name:'Cable external rotation',         sets:3, repRange:[15,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Extra ER volume — most urgent finding' },
+      { id:'ep-slyder',  name:'Side-lying DB external rotation', sets:2, repRange:[12,12], weight:2.5,  inc:1.25, type:'weighted', cue:'Tiny weight, perfect form, elbow tucked' },
+      { id:'ep-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[15,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Extra wrist extensor volume' },
+      { id:'ep-pallof',  name:'Pallof press',                    sets:3, repRange:[10,10], weight:10,   inc:2.5,  type:'weighted', cue:'Anti-rotation, ribs down' },
+      { id:'ep-ghd',     name:'GHD back extension',              sets:2, repRange:[12,12], weight:'BW', type:'bw',       cue:'Finish at straight line only — do NOT hyperextend', caution:'Controlled range, foot anchored' },
+    ],
+    'Upper C': [
+      { id:'uc-chinup',  name:'Pull-up supinated chin-up',       sets:4, repRange:[3,4],   weight:'BW',  type:'bw',       cue:'Control the negative' },
+      { id:'uc-ext-rot', name:'Cable external rotation',         sets:3, repRange:[12,15], weight:6.25,  inc:1.25, type:'weighted', staple:true, cue:'Never skip' },
+      { id:'uc-latpd',   name:'Lat pulldown',                   sets:3, repRange:[8,10],  weight:60,    inc:2.5,  type:'weighted', cue:'Elbow tuck, no swing' },
+      { id:'uc-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,     inc:1.25, type:'weighted', staple:true, cue:'' },
+      { id:'uc-dbpress', name:'Neutral DB shoulder press',       sets:3, repRange:[8,10],  weight:13,    inc:2,    type:'weighted', cue:'Ribs down, no low-back arch', caution:'No heavy OHP pre-physio, shoulder flags present' },
+      { id:'uc-srow',    name:'Seated cable row',                sets:3, repRange:[10,12], weight:60,    inc:2.5,  type:'weighted', cue:'Extra pull volume' },
+      { id:'uc-hlr',     name:'Hanging leg raise',               sets:3, repRange:[8,10],  weight:'BW',  type:'bw',       cue:'Switch to lying if grip fails first' },
+    ],
+  };
+
+  /* ─── GYM LOGGER HELPERS ────────────────────────────────────────── */
+  function getTimedTarget(exId, defaultSec) {
+    try { const t = JSON.parse(localStorage.getItem('tt_ex_targets')||'{}'); return t[exId] || defaultSec; }
+    catch { return defaultSec; }
+  }
+  function setTimedTarget(exId, sec) {
+    try { const t = JSON.parse(localStorage.getItem('tt_ex_targets')||'{}'); t[exId]=sec; localStorage.setItem('tt_ex_targets',JSON.stringify(t)); }
+    catch {}
+  }
+
+  function getLastGymEx(exId) {
+    const sessions = loadSessions(KEY_GYM);
+    for (let i = sessions.length - 1; i >= 0; i--) {
+      const ex = sessions[i].exercises?.find(e => e.id === exId);
+      if (ex && ex.sets?.length) return { date: sessions[i].date, sets: ex.sets };
+    }
+    return null;
+  }
+
+  function formatLastGymEx(last) {
+    if (!last) return 'No previous data';
+    const dateStr = formatDisplayDate(last.date);
+    const parts = last.sets.map((s, i) => {
+      const val = s.secs != null ? `${s.secs}s` : `${s.weight}×${s.reps}`;
+      return `Set${i+1} ${val}`;
+    });
+    return `Last session ${dateStr}: ${parts.join(', ')}`;
+  }
+
+  function wOpts(def) {
+    const base = [...WEIGHT_OPTS_BASE];
+    const defN = (def !== 'BW') ? Number(def) : 'BW';
+    if (defN !== 'BW' && !base.includes(defN)) {
+      const idx = base.findIndex(v => typeof v === 'number' && v > defN);
+      idx > -1 ? base.splice(idx, 0, defN) : base.push(defN);
+    }
+    return base.map(v => {
+      const sel = String(v) === String(def) ? ' selected' : '';
+      const lbl = v === 'BW' ? 'BW' : `${v} kg`;
+      return `<option value="${v}"${sel}>${lbl}</option>`;
+    }).join('');
+  }
+
+  function rOpts(def) {
+    let h = '';
+    for (let i = 1; i <= 30; i++) h += `<option value="${i}"${i === def ? ' selected' : ''}>${i}</option>`;
+    return h;
+  }
+
+  function rirOpts(def) {
+    def = def == null ? '2' : String(def);
+    return ['0','1','2','3','4+'].map(v => `<option value="${v}"${v === def ? ' selected' : ''}>${v}</option>`).join('');
+  }
+
+  function buildSetRows(ex, lastData) {
+    let html = '';
+    for (let i = 0; i < ex.sets; i++) {
+      const last  = lastData?.sets?.[i];
+      const defW  = last?.weight  ?? ex.weight;
+      const defR  = last?.reps    ?? (ex.repRange ? ex.repRange[0] : 1);
+      const defRIR = last?.rir    ?? '2';
+      const defSec = last?.secs   ?? getTimedTarget(ex.id, ex.targetSec || 30);
+
+      if (ex.type === 'timed') {
+        html += `<div class="set-row">
+          <span class="set-lbl">Set ${i+1}</span>
+          <input type="number" class="sel-secs" min="5" max="600" step="5" value="${defSec}" />
+          <span style="font-size:12px;color:var(--text-sec);white-space:nowrap;flex-shrink:0">sec</span>
+        </div>`;
+      } else {
+        html += `<div class="set-row">
+          <span class="set-lbl">Set ${i+1}</span>
+          <select class="sel-weight">${wOpts(defW)}</select>
+          <select class="sel-reps">${rOpts(defR)}</select>
+          <select class="sel-rir">${rirOpts(defRIR)}</select>
+        </div>`;
+      }
+    }
+    return html;
+  }
+
+  function renderExCard(ex) {
+    if (ex.type === 'zone2') return '';
+    const lastData = getLastGymEx(ex.id);
+    const lastStr  = formatLastGymEx(lastData);
+    const staple   = ex.staple ? `<span class="badge badge-staple">STAPLE</span>` : '';
+    const cautionIcon = ex.caution
+      ? `<span class="caution-icon" onclick="this.closest('.ex-card').querySelector('.caution-text').classList.toggle('open')">⚠️</span>`
+      : '';
+    const cautionText = ex.caution ? `<div class="caution-text">${ex.caution}</div>` : '';
+    const cueHtml     = ex.cue    ? `<div class="ex-cue">${ex.cue}</div>` : '';
+
+    return `<div class="card ex-card" data-ex-id="${ex.id}">
+      <div class="ex-header">
+        <span class="ex-name">${ex.name}</span>
+        ${staple}${cautionIcon}
+      </div>
+      ${cautionText}
+      ${cueHtml}
+      <div class="ex-last">${lastStr}</div>
+      <div class="set-rows">${buildSetRows(ex, lastData)}</div>
+      <textarea class="ex-notes" placeholder="Notes…"></textarea>
+    </div>`;
+  }
+
+  /* ─── GYM LOGGER RENDER ─────────────────────────────────────────── */
+  function renderGymLogger() {
+    const today     = new Date();
+    const todayStr  = toDateStr(today);
+    const settings  = loadSettings();
+    const blockName = settings.block || getAutoBlock(todayStr);
+    const dayType   = getDayType(blockName, today);
+
+    document.getElementById('gym-screen-title').textContent = dayType || 'Rest Day';
+    document.getElementById('gym-screen-sub').textContent   = `${formatDisplayDate(todayStr)} · ${blockName}`;
+
+    const isEngine = ['Engine + Lower','Engine + Prehab'].includes(dayType);
+    document.getElementById('gym-zone2-card').style.display = isEngine ? 'block' : 'none';
+
+    const exercises = GYM_EXERCISES[dayType] || [];
+    document.getElementById('gym-exercise-list').innerHTML = exercises.map(renderExCard).join('');
+  }
+
+  /* ─── PROGRESSIVE OVERLOAD ──────────────────────────────────────── */
+  function checkOverload(ex, sets) {
+    const out = { ready:false, nextWeight:null, stall:false };
+    if (!sets.length) return out;
+
+    if (ex.type === 'timed') {
+      const target = getTimedTarget(ex.id, ex.targetSec || 30);
+      if (sets.every(s => (s.secs || 0) >= target)) {
+        out.ready = true;
+        setTimedTarget(ex.id, target + 5);
+      }
+      return out;
+    }
+
+    if (ex.type === 'bw') {
+      if (sets.every(s => s.reps >= ex.repRange[1])) out.ready = true;
+      return out;
+    }
+
+    if (ex.type === 'weighted' || ex.type === 'assisted') {
+      const top    = ex.repRange[1];
+      const allHit = sets.every(s => s.reps >= top && ['0','1','2'].includes(String(s.rir)));
+      if (allHit) {
+        out.ready = true;
+        const w = parseFloat(sets[0].weight);
+        if (!isNaN(w)) out.nextWeight = +(w + (ex.inc || 2.5)).toFixed(2);
+      }
+      const sessions = loadSessions(KEY_GYM);
+      const lastThree = [];
+      for (let i = sessions.length - 1; i >= 0 && lastThree.length < 3; i--) {
+        const ed = sessions[i].exercises?.find(e => e.id === ex.id);
+        if (ed?.sets?.length) lastThree.push(ed);
+      }
+      if (lastThree.length >= 3) {
+        const w0     = lastThree[0].sets[0]?.weight;
+        const sameW  = lastThree.every(e => e.sets[0]?.weight === w0);
+        const noProg = lastThree.every(e => !e.progressionFlag);
+        if (sameW && noProg) out.stall = true;
+      }
+    }
+    return out;
+  }
+
+  /* ─── SAVE GYM SESSION ──────────────────────────────────────────── */
+  function saveGymSession() {
+    const today     = new Date();
+    const todayStr  = toDateStr(today);
+    const settings  = loadSettings();
+    const blockName = settings.block || getAutoBlock(todayStr);
+    const dayType   = getDayType(blockName, today);
+    const exercises = GYM_EXERCISES[dayType] || [];
+
+    // STAPLE check
+    const todayNames = exercises.map(e => e.name.toLowerCase());
+    const hasER      = todayNames.some(n => n.includes('external rotation'));
+    const hasWC      = todayNames.some(n => n.includes('wrist curl'));
+    if (!hasER || !hasWC) {
+      if (!confirm('STAPLE exercises not logged — are you sure?')) return;
+    }
+
+    const painScore   = parseInt(document.getElementById('pain-slider').value);
+    const energyScore = parseInt(document.getElementById('energy-slider').value);
+
+    let zone2 = null;
+    if (['Engine + Lower','Engine + Prehab'].includes(dayType)) {
+      zone2 = {
+        duration: parseInt(document.getElementById('z2-duration').value) || 35,
+        avgHR:    parseInt(document.getElementById('z2-hr').value) || null,
+        modality: document.querySelector('#z2-modality .mod-pill.active')?.dataset.mod || 'Bike',
+      };
+    }
+
+    const exerciseData     = [];
+    const progressionAlerts = [];
+
+    exercises.forEach(ex => {
+      if (ex.type === 'zone2') return;
+      const card = document.querySelector(`[data-ex-id="${ex.id}"]`);
+      if (!card) return;
+
+      let sets = [];
+      if (ex.type === 'timed') {
+        card.querySelectorAll('.sel-secs').forEach((inp, i) => {
+          sets.push({ setNum: i+1, secs: parseInt(inp.value) || 0 });
+        });
+      } else {
+        card.querySelectorAll('.set-row').forEach((row, i) => {
+          const wEl  = row.querySelector('.sel-weight');
+          const rEl  = row.querySelector('.sel-reps');
+          const rirEl= row.querySelector('.sel-rir');
+          if (!wEl) return;
+          sets.push({ setNum:i+1, weight:wEl.value, reps:parseInt(rEl.value)||0, rir:rirEl.value });
+        });
+      }
+
+      const notes = card.querySelector('.ex-notes')?.value || '';
+      const flags = checkOverload(ex, sets);
+      if (flags.ready && flags.nextWeight !== null) {
+        progressionAlerts.push({ exercise: ex.name, suggestedWeight: flags.nextWeight });
+      }
+      exerciseData.push({ id:ex.id, name:ex.name, sets, notes, progressionFlag:flags.ready, stallFlag:flags.stall });
+    });
+
+    const session = { date:todayStr, block:blockName, dayType, painScore, energyScore, zone2, exercises:exerciseData, progressionAlerts };
+    const sessions = loadSessions(KEY_GYM);
+    sessions.push(session);
+    localStorage.setItem(KEY_GYM, JSON.stringify(sessions));
+
+    const stalls = exerciseData.filter(e => e.stallFlag);
+    let msg = 'Session saved!';
+    if (progressionAlerts.length) msg += `\n\n↑ Ready to progress:\n${progressionAlerts.map(a=>`${a.exercise} → ${a.suggestedWeight} kg`).join('\n')}`;
+    if (stalls.length) msg += `\n\n⚠ Stall alert:\n${stalls.map(e=>e.name).join('\n')}`;
+    alert(msg);
+
+    renderDashboard();
+    navigateTo('screen-home');
+  }
+
+  /* ─── GYM LOGGER INIT ───────────────────────────────────────────── */
+  function initGymLogger() {
+    const painSlider   = document.getElementById('pain-slider');
+    const painVal      = document.getElementById('pain-val');
+    const energySlider = document.getElementById('energy-slider');
+    const energyVal    = document.getElementById('energy-val');
+    painSlider.addEventListener('input',   () => { painVal.textContent   = painSlider.value; });
+    energySlider.addEventListener('input', () => { energyVal.textContent = energySlider.value; });
+
+    const z2Dur = document.getElementById('z2-duration');
+    for (let m = 20; m <= 60; m += 5) {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = `${m} min`;
+      if (m === 35) opt.selected = true;
+      z2Dur.appendChild(opt);
+    }
+
+    document.getElementById('z2-modality').addEventListener('click', e => {
+      const pill = e.target.closest('.mod-pill');
+      if (!pill) return;
+      document.querySelectorAll('#z2-modality .mod-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+
+    document.getElementById('btn-complete-session').addEventListener('click', saveGymSession);
+  }
+
+  /* ─── INIT ──────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        navigateTo(tab.dataset.target);
+        if (tab.dataset.target === 'screen-home')     renderDashboard();
+        if (tab.dataset.target === 'screen-settings') renderSettings();
+      });
+    });
+    initSettings();
+    initGymLogger();
+    renderDashboard();
+  });
+</script>
+</body>
+</html>
