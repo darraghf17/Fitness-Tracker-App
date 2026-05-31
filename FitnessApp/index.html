@@ -349,6 +349,138 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+    /* ─── MOBILITY LOGGER ───────────────────────────────────────────── */
+    .mob-section-label {
+      font-size: 12px; font-weight: 700; color: var(--text-sec);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      margin: 16px 0 8px; padding: 4px 0;
+    }
+    .mob-ex-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .mob-ex-row:last-child { border-bottom: none; }
+    .mob-ex-check {
+      flex-shrink: 0; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .mob-ex-check input[type="checkbox"] {
+      width: 24px; height: 24px; min-height: 24px;
+      cursor: pointer; accent-color: var(--primary);
+    }
+    .mob-ex-body { flex: 1; min-width: 0; }
+    .mob-ex-name { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .mob-ex-target { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+    .mob-ex-cue { font-size: 12px; color: var(--primary); margin-top: 2px; font-style: italic; }
+    .mob-ex-icons { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+    .mob-ex-inputs { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+    .mob-ex-inputs input[type="number"] {
+      width: 80px; font-size: 13px; padding: 5px 8px;
+      min-height: 36px; flex-shrink: 0;
+    }
+    .mob-ex-inputs input[type="text"] {
+      flex: 1; font-size: 13px; padding: 5px 8px; min-height: 36px;
+    }
+    .mob-flag {
+      font-size: 11px; font-weight: 700; background: #fdf2f2; color: var(--danger);
+      border-radius: 6px; padding: 2px 8px; cursor: pointer; user-select: none;
+    }
+    .mob-caution {
+      font-size: 11px; font-weight: 700; background: #fff8e1; color: var(--amber);
+      border-radius: 6px; padding: 2px 8px; cursor: pointer; user-select: none;
+    }
+    .mob-flag-body, .mob-caution-body {
+      display: none; font-size: 11px; border-radius: 6px;
+      padding: 6px 8px; margin-top: 4px; line-height: 1.5;
+    }
+    .mob-flag-body { background: #fdf2f2; color: var(--danger); }
+    .mob-caution-body { background: #fff8e1; color: var(--amber); }
+    .mob-locked-row { opacity: 0.42; }
+    .mob-locked-row .mob-ex-check { pointer-events: none; }
+    .mob-lock-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; }
+    .mob-meas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mob-meas-field { display: flex; flex-direction: column; gap: 3px; }
+    .mob-meas-last { font-size: 11px; color: var(--text-sec); margin-top: 1px; }
+
+    /* ─── HR LOGGER ──────────────────────────────────────────────────── */
+    .hr-logger-card { background: linear-gradient(135deg,#f0faf3,#e8f2ec); border: 2px solid var(--primary); }
+    .hr-logger-row { display: flex; gap: 10px; align-items: flex-end; margin-top: 10px; }
+    .hr-logger-row input { flex: 1; font-size: 20px; font-weight: 700; text-align: center; }
+    .hr-today-val { font-size: 30px; font-weight: 800; color: var(--primary); text-align: center; padding: 6px 0 2px; }
+    .hr-today-lbl { font-size: 12px; color: var(--text-sec); text-align: center; }
+
+    /* ─── BENCHMARKS ─────────────────────────────────────────────────── */
+    .bench-vals { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 10px; }
+    .bench-val-group { display: flex; flex-direction: column; align-items: center; }
+    .bench-val-group.grow { flex: 1; }
+    .bench-val-label { font-size: 10px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .bench-val-static { font-size: 18px; font-weight: 800; line-height: 1.1; }
+    .bench-current-wrap { display: flex; align-items: center; gap: 4px; }
+    .bench-current-wrap input {
+      font-size: 16px; font-weight: 700; color: var(--primary);
+      width: 76px; padding: 4px 6px; min-height: 34px; text-align: center;
+      border: 2px solid var(--border); border-radius: 8px; background: var(--card);
+    }
+    .bench-current-wrap input:focus { border-color: var(--primary); }
+    .bench-unit { font-size: 12px; color: var(--text-sec); }
+    .bench-progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
+    .bench-progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s ease; }
+    .bench-progress-pct { font-size: 11px; color: var(--text-sec); }
+    .bench-sparkline-wrap { height: 52px; margin-top: 10px; }
+
+    /* ─── ZONE 2 TABLE ───────────────────────────────────────────────── */
+    .z2-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .z2-table th { font-size: 10px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.05em; padding: 5px 6px; border-bottom: 2px solid var(--border); text-align: left; }
+    .z2-table td { padding: 8px 6px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .z2-table tr:last-child td { border-bottom: none; }
+
+    /* ─── OVERLOAD TRACKING ──────────────────────────────────────────── */
+    .ol-history-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ol-history-table th { font-size: 10px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.04em; padding: 5px 4px; border-bottom: 2px solid var(--border); text-align: left; white-space: nowrap; }
+    .ol-history-table td { padding: 7px 4px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+    .ol-history-table tr:last-child td { border-bottom: none; }
+    .ol-progressed { color: var(--success); font-weight: 700; }
+    .ol-chart-wrap { height: 180px; margin: 4px 0; }
+    .ol-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 700; padding: 5px 14px;
+      border-radius: 20px; margin-bottom: 12px;
+    }
+    .ol-status-building { background: var(--primary-lt); color: var(--primary); border: 2px solid var(--primary); }
+    .ol-status-ready    { background: #f0faf3; color: var(--success); border: 2px solid var(--success); }
+    .ol-status-settling { background: #fffbeb; color: var(--amber);   border: 2px solid var(--amber); }
+    .ol-stall-card {
+      background: #fffbeb; border: 2px solid var(--amber); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px;
+    }
+    .ol-stall-card i { color: var(--amber); flex-shrink: 0; margin-top: 2px; }
+    .ol-stall-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .ol-stall-sub  { font-size: 12px; color: var(--text-sec); }
+    .pp-ratio { font-size: 32px; font-weight: 800; line-height: 1.1; margin: 8px 0 4px; }
+    .pp-ratio.green { color: var(--success); }
+    .pp-ratio.red   { color: var(--danger); }
+    .pp-detail { font-size: 13px; color: var(--text-sec); }
+
+    /* ─── WHY? EXPANDABLE ───────────────────────────────────────────────── */
+    .why-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700;
+      background: var(--primary-lt); color: var(--primary);
+      border: 1.5px solid var(--primary); border-radius: 20px;
+      padding: 3px 11px; cursor: pointer; font-family: inherit;
+      transition: background 0.15s ease, color 0.15s ease;
+      margin-top: 5px;
+    }
+    .why-btn:active { background: var(--primary); color: #fff; }
+    .why-body {
+      font-size: 13px; color: var(--text-sec); line-height: 1.7;
+      background: var(--primary-lt); border-radius: 10px;
+      border-left: 3px solid var(--primary);
+      max-height: 0; overflow: hidden; padding: 0 12px;
+      transition: max-height 0.28s ease, padding 0.2s ease;
+    }
+    .why-body.open { max-height: 400px; padding: 10px 12px; }
+
     /* ─── DASHBOARD ──────────────────────────────────────────────── */
     .dash-greeting {
       font-size: 22px;
@@ -729,53 +861,73 @@
   <section id="screen-mobility" class="screen">
     <div class="screen-header">
       <h1>Mobility Logger</h1>
-      <p>Track stretches, drills &amp; warm-up work</p>
+      <p id="mob-date-sub">Today's routine</p>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-person-running"></i>
-      <h3>Routine Selector</h3>
-      <p>Choose a pre-built mobility routine (Morning, Pre-Lift, Post-Lift, Recovery) or build a custom flow for the day.</p>
+    <div class="mob-section-label">Daily</div>
+    <div class="card" id="mob-daily-list"></div>
+
+    <div class="mob-section-label">3–4x Per Week</div>
+    <div class="card" id="mob-weekly-list"></div>
+
+    <div id="mob-locked-section">
+      <div class="mob-section-label" style="color:var(--text-sec)">Post-9 June (Locked)</div>
+      <div class="card" id="mob-locked-list"></div>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-stopwatch"></i>
-      <h3>Drill Logger</h3>
-      <p>Each drill: movement name, duration (seconds) or reps, side (bilateral / left / right), and a comfort-scale rating 1–5. CAUTION notes expandable inline.</p>
+    <!-- 4-week measurements -->
+    <div class="card">
+      <div class="card-title">4-Week Measurements</div>
+      <div class="mob-meas-grid" id="mob-meas-grid"></div>
+      <div style="margin-top:14px">
+        <button class="btn btn-secondary btn-full" id="btn-log-measurements" style="display:none">
+          <i class="fa-solid fa-ruler"></i>&nbsp; Log Measurements
+        </button>
+      </div>
+      <div id="mob-meas-form" style="display:none;margin-top:14px"></div>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-chart-simple"></i>
-      <h3>Mobility Trends</h3>
-      <p>Weekly completion ring and comfort-score trends per body area (hips, shoulders, thoracic, ankles) will appear here.</p>
+    <div style="padding:8px 0 16px">
+      <button class="btn btn-full" id="btn-complete-mobility"
+        style="background:var(--amber);color:#fff;font-size:16px;padding:16px;border-radius:var(--radius-btn)">
+        <i class="fa-solid fa-check-circle"></i>&nbsp; Complete Mobility Session
+      </button>
     </div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════
-       SCREEN 4 — BENCHMARKS
+       SCREEN 4 — PROGRESS / BENCHMARKS
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-progress" class="screen">
     <div class="screen-header">
-      <h1>Benchmarks</h1>
-      <p>Track your key lifts and performance goals</p>
+      <h1>Progress</h1>
+      <p>Benchmarks &amp; performance tracking</p>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-chart-line"></i>
-      <h3>Lift Progress Charts</h3>
-      <p>Chart.js line charts per benchmark exercise showing weight / estimated 1RM over time. Toggle between 4 weeks, 3 months, and all time.</p>
+    <!-- Resting HR -->
+    <div class="card hr-logger-card">
+      <div class="card-title">Resting Heart Rate</div>
+      <div id="hr-today-display"></div>
+      <div class="hr-logger-row">
+        <input type="number" id="hr-input" min="30" max="200" placeholder="e.g. 58" />
+        <button class="btn btn-primary" id="btn-log-hr" style="flex-shrink:0">Log HR</button>
+      </div>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-trophy"></i>
-      <h3>Personal Records</h3>
-      <p>All-time PRs per exercise: 1RM, 3RM, 5RM, max volume in a single session. Highlighted in gold when recently broken.</p>
-    </div>
+    <!-- Benchmark cards -->
+    <div class="section-label">Benchmarks</div>
+    <div id="bench-cards-list"></div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-bullseye"></i>
-      <h3>Goal Targets</h3>
-      <p>Set a target weight or rep count for any lift. A progress bar and ETA estimate based on current rate of progression will display here.</p>
+    <!-- Zone 2 history -->
+    <div class="card">
+      <div class="card-title">Zone 2 History</div>
+      <div style="overflow-x:auto">
+        <table class="z2-table">
+          <thead><tr><th>Date</th><th>Modality</th><th>Duration</th><th>Avg HR</th></tr></thead>
+          <tbody id="z2-history-body"></tbody>
+        </table>
+        <div id="z2-empty" style="display:none;font-size:13px;color:var(--text-sec);padding:12px 0">No Zone 2 sessions logged yet.</div>
+      </div>
     </div>
   </section>
 
@@ -785,25 +937,51 @@
   <section id="screen-overload" class="screen">
     <div class="screen-header">
       <h1>Overload Tracking</h1>
-      <p>Progressive overload decisions for every lift</p>
+      <p>Progressive overload for every lift</p>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-arrow-trend-up"></i>
-      <h3>Overload Table</h3>
-      <p>One row per tracked exercise. Columns: name, current load, last 3 sessions, trend arrow, and a status badge — ↑ PROGRESSION READY, ⚠ STALL ALERT, or ON TRACK.</p>
+    <!-- Exercise selector -->
+    <div class="card" style="padding:16px 20px">
+      <label for="ol-exercise-select">Exercise</label>
+      <select id="ol-exercise-select"></select>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-sliders"></i>
-      <h3>Overload Rules</h3>
-      <p>Per-exercise config: minimum sets at target reps before increasing load, step-up increment (kg/lbs), deload trigger (e.g. 3 consecutive stalls).</p>
+    <!-- Session history -->
+    <div class="card">
+      <div class="card-title">Session History</div>
+      <div style="overflow-x:auto">
+        <table class="ol-history-table">
+          <thead>
+            <tr><th>Date</th><th>Set 1</th><th>Set 2</th><th>Set 3</th><th>Set 4</th><th>Avg RIR</th><th>Notes</th><th>↑</th></tr>
+          </thead>
+          <tbody id="ol-history-body"></tbody>
+        </table>
+        <div id="ol-history-empty" style="display:none;font-size:13px;color:var(--text-sec);padding:12px 0">No sessions logged for this exercise yet.</div>
+      </div>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-clock-rotate-left"></i>
-      <h3>Overload History</h3>
-      <p>Timeline of every weight or rep increase with date and session notes. Export as CSV in a future build.</p>
+    <!-- Working weight chart -->
+    <div class="card">
+      <div class="card-title">Working Weight</div>
+      <div class="ol-chart-wrap"><canvas id="ol-weight-chart"></canvas></div>
+    </div>
+
+    <!-- Progression status (injected by JS) -->
+    <div id="ol-status-section"></div>
+
+    <!-- Stall alerts -->
+    <div class="card">
+      <div class="card-title">Stall Alerts
+        <span style="font-size:12px;color:var(--text-sec);font-weight:400"> · All exercises · 3+ sessions same weight</span>
+      </div>
+      <div id="ol-stalls-list"></div>
+    </div>
+
+    <!-- Pull : push ratio -->
+    <div class="card" style="text-align:center">
+      <div class="card-title">Pull : Push Ratio</div>
+      <div class="pp-ratio" id="pp-ratio-display">—</div>
+      <div class="pp-detail" id="pp-ratio-detail"></div>
     </div>
   </section>
 
@@ -813,25 +991,34 @@
   <section id="screen-report" class="screen">
     <div class="screen-header">
       <h1>Coach Report</h1>
-      <p>Auto-generated weekly summary for your coach</p>
+      <p>Auto-generated summary for your coach</p>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-file-lines"></i>
-      <h3>Weekly Summary</h3>
-      <p>Auto-compiled report: sessions completed, key lifts with loads and sets, PRs hit, stalls flagged, mobility compliance percentage, and any session notes you added.</p>
+    <div class="card">
+      <div class="card-title">Report Period</div>
+      <div style="display:flex;gap:10px">
+        <div class="form-group" style="flex:1;margin-bottom:0">
+          <label for="report-from">From</label>
+          <input type="date" id="report-from" />
+        </div>
+        <div class="form-group" style="flex:1;margin-bottom:0">
+          <label for="report-to">To</label>
+          <input type="date" id="report-to" />
+        </div>
+      </div>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-pen-to-square"></i>
-      <h3>Custom Notes</h3>
-      <p>Free-text field to add context for your coach before sending: fatigue level, injuries, life stress rating 1–10.</p>
+    <div class="card">
+      <div class="card-title">Notes for Coach</div>
+      <textarea id="report-notes" class="ex-notes" style="min-height:110px;resize:vertical"
+        placeholder="Anything you want your coach to know this period…"></textarea>
     </div>
 
-    <div class="placeholder-block">
-      <i class="fa-solid fa-share-nodes"></i>
-      <h3>Export &amp; Share</h3>
-      <p>Copy as plain text or Markdown, or open in the native share sheet. Formatted for easy pasting into WhatsApp or email.</p>
+    <div style="padding:8px 0 16px">
+      <button class="btn btn-full" id="btn-generate-report"
+        style="background:var(--success);color:#fff;font-size:16px;padding:16px;border-radius:var(--radius-btn)">
+        <i class="fa-solid fa-file-export"></i>&nbsp; Generate Report
+      </button>
     </div>
   </section>
 
@@ -1065,7 +1252,10 @@
     if (tab) tab.classList.add('active');
     const scr = document.getElementById(screenId);
     if (scr) scr.classList.add('active');
-    if (screenId === 'screen-gym') renderGymLogger();
+    if (screenId === 'screen-gym')      renderGymLogger();
+    if (screenId === 'screen-mobility') renderMobilityLogger();
+    if (screenId === 'screen-progress') renderProgress();
+    if (screenId === 'screen-overload') renderOverload();
   }
 
   /* ─── DASHBOARD RENDER ──────────────────────────────────────────── */
@@ -1262,6 +1452,40 @@
     ],
   };
 
+  /* ─── EXERCISE JUSTIFICATIONS ──────────────────────────────────────── */
+  const EX_WHY_TEXTS = (function() {
+    const ER    = "Your external rotation strength tested at 6.25kg against a lat pulldown of 90kg — a 14:1 ratio that is a direct pathway to rotator cuff injury. This exercise is the single most urgent clinical finding from your assessment. Every session of this work closes that ratio and builds the protective shoulder strength that lets you pull heavy safely for years.";
+    const WRIST = "Your wrist flexor-to-extensor ratio tested at 5:1 — the ideal for injury prevention is 2:1. This imbalance is the primary driver of your golfer's elbow recurrence risk. Every set of reverse wrist curls chips away at that ratio and builds the antagonist forearm strength that protects your tendons during high-volume climbing.";
+    const SROW  = "Horizontal pulling is the foundation of scapular health and shoulder stability for climbing. Your cable row tested at 80kg with bilateral scapular symmetry — the best combined result of your entire assessment. This exercise maintains and builds that base, directly supporting the retraction control you need for dynamic moves and steep wall positions.";
+    const LATPD = "Your lat pulldown tested at 90kg full stack — a genuine strength. The goal here is to reinforce the elbow-tuck pattern that maximises lat engagement over biceps, and to build the vertical pulling endurance that underpins lock-offs and roof climbing. Consistent lat strength is what keeps you on the wall when pump starts to set in.";
+    const PALLOF = "Rotational stability is the missing piece between having strong abs and having a strong climbing core. The Pallof press trains your trunk to resist rotation under load, which directly translates to keeping your hips square on steep terrain, controlling flag positions, and absorbing dynamic moves without losing body tension.";
+    return {
+      'ua-pullup':   "The strict pull-up is the single most important gym metric for climbing performance. Your honest baseline is 5 reps at 94kg — every additional rep directly translates to harder moves on the wall. Neutral grip is prioritised early because it is the most elbow-friendly variation, protecting your golfer's elbow history while you build volume.",
+      'ua-ext-rot':  ER,   'ub-ext-rot':  ER,   'ep-ext-rot':  ER,   'uc-ext-rot':  ER,
+      'ua-latpd':    LATPD, 'uc-latpd':   LATPD,
+      'ua-wrist':    WRIST, 'ub-wrist':   WRIST, 'ep-wrist':   WRIST, 'uc-wrist':   WRIST,
+      'ua-srow':     SROW,  'uc-srow':    SROW,
+      'ua-pallof':   PALLOF, 'ep-pallof':  PALLOF,
+      'ua-facepull': "Face pulls train the rear deltoid and external rotators together under light load — essential shoulder health work for anyone pulling as much as you do. They directly counteract the internal rotation pattern that builds up from climbing and desk work, and they support the rotator cuff protective work you are already doing with cable external rotation.",
+      'ua-deadbug':  "Your core tests showed lumbar stabiliser endurance as the consistent weak link — your lower back lifts before your legs or arms fail on every core test. The dead bug trains anti-extension under load in exactly the position that matters for climbing: keeping your body rigid on overhangs and roof sections where your core is the only thing stopping your hips from sagging off the wall.",
+      'el-hipab':    "Your glute medius is weak bilaterally — confirmed by knee cave on hinge movements and hip compensation on heel raises. Weak hip abductors increase stress on your injured ankle and foot by removing the stabilising force from above. Strengthening this now, while the foot is still restricted, is one of the most protective things you can do before returning to full loading.",
+      'el-bandab':   "This is the isolated activation version of the same glute medius work as the machine — lighter, slower, and more targeted. Together these two exercises build the hip stability that underpins every single-leg position on the climbing wall, from smearing on slab to flagging on overhang.",
+      'el-hamcurl':  "Your posterior chain is undertrained relative to your anterior chain — a pattern consistent with desk work and climbing without adequate antagonist training. Hamstring strength directly supports knee and hip stability on the wall and contributes to the heel hook loading you currently cannot generate effectively. Load is kept conservative due to the suspected proximal hamstring tendinopathy on the right.",
+      'el-calf':     "Your dorsiflexion deficit of 3cm bilaterally is your highest-impact single mobility limitation. Single-leg calf raises build the eccentric calf strength and tendon resilience that underpin dorsiflexion range — you cannot stretch your way to ankle mobility without also strengthening the structures around it. Left leg only until the right foot is cleared by the physio.",
+      'el-plank':    "Lumbar stabiliser endurance was the consistent failure mode across all three of your core tests — your lower back sags before anything else gives out. The plank is the most direct training stimulus for this quality. Improving your plank time from 62 seconds toward 90 seconds and beyond directly improves your ability to maintain body tension on sustained climbing sequences.",
+      'ub-dbrow':    "Horizontal pulling volume is the backbone of balanced shoulder health for climbers. Your single-arm row tested at 30kg with no bilateral asymmetry — an important positive. This exercise builds the mid-back thickness and scapular control that stabilises your shoulder under load, and the unilateral format ensures neither side compensates for the other.",
+      'ub-csrow':    "The chest-supported variation removes any opportunity for lower back compensation, forcing all the work into the mid-back and rear delts. This is horizontal pulling volume at its most honest — you cannot cheat it with a torso swing. It directly supports the scapular retraction pattern that protects your shoulder on heavy pulling days.",
+      'ub-adip':     "Your dip max tested at 4 reps — significantly below the 10–15 rep recreational benchmark and well behind your pulling numbers. Dip strength is the primary pushing antagonist to your pulling work, and weak triceps and anterior shoulders limit your ability to mantel, push through awkward top-out positions, and maintain elbow health under climbing load. The assist lets you train real volume while your strength catches up.",
+      'ub-scappu':   "You scored 9 clean scapular pull-up reps with correct lat and lower trap activation — one of the best results in your entire assessment. This movement trains the bottom of the pull-up specifically: the scapular depression that initiates every efficient pull and protects the shoulder from impingement. Maintaining and building this is foundational climbing strength.",
+      'ub-bdog':     "The bird dog trains contralateral limb coordination and anti-rotation stability — exactly the core quality you use when flagging and back-flagging on the wall. Your flagging is already instinctive, but building the underlying motor control under deliberate slow load makes it more reliable under fatigue and on harder terrain where the positions are less familiar.",
+      'ep-slyder':   "A lighter, more isolated version of the cable external rotation, done lying to eliminate any compensation. Thursday's extra ER volume exists because 6.25kg against 90kg of lat strength is the most urgent injury finding in your entire assessment — the shoulder cannot be protected by one set of exercises alone. This second stimulus accelerates the ratio correction that keeps your rotator cuff healthy under climbing load.",
+      'ep-ghd':      "Your posterior chain endurance tested at 41 seconds on the arch hold — adequate but not strong. The GHD back extension builds the lumbar erector and glute endurance that underpins body tension on steep terrain, controls your hip position on dynamic moves, and supports the deadlift and hinge patterns you will be loading more heavily once the foot is cleared. Controlled range only — no hyperextension.",
+      'uc-chinup':   "The supinated chin-up recruits the biceps more heavily alongside the lats, giving slightly different stimulus to the same pulling pattern. Your assessment showed no elbow discomfort on this variation — an important positive given your golfer's elbow history. Rotating between neutral and supinated grip across the week reduces cumulative tendon stress while maintaining pulling volume.",
+      'uc-dbpress':  "Your strict overhead press tested at 40kg with a lower back arch at every weight — the real strength ceiling without compensation is likely 30–35kg. The arch is a symptom of thoracic stiffness and left shoulder restriction, not pressing weakness. Neutral grip reduces shoulder impingement risk compared to a barbell and keeps the movement pain-free while you build the overhead stability that translates to lock-offs and reaching moves on the wall.",
+      'uc-hlr':      "Hanging leg raises build hip flexor strength and core compression simultaneously — exactly the combination you need to load heel hooks and toe hooks effectively. Your assessment identified that you cannot generate sufficient hip flexor tension to load hooks properly. This exercise directly addresses that limiter while also training the dead hang grip endurance that feeds into your 90-second hang target.",
+    };
+  })();
+
   /* ─── GYM LOGGER HELPERS ────────────────────────────────────────── */
   function getTimedTarget(exId, defaultSec) {
     try { const t = JSON.parse(localStorage.getItem('tt_ex_targets')||'{}'); return t[exId] || defaultSec; }
@@ -1353,6 +1577,10 @@
       : '';
     const cautionText = ex.caution ? `<div class="caution-text">${ex.caution}</div>` : '';
     const cueHtml     = ex.cue    ? `<div class="ex-cue">${ex.cue}</div>` : '';
+    const why = EX_WHY_TEXTS[ex.id];
+    const whyHtml = why
+      ? `<button class="why-btn" onclick="(function(b){var p=b.nextElementSibling;p.classList.toggle('open')})(this)">Why?</button><div class="why-body">${why}</div>`
+      : '';
 
     return `<div class="card ex-card" data-ex-id="${ex.id}">
       <div class="ex-header">
@@ -1361,6 +1589,7 @@
       </div>
       ${cautionText}
       ${cueHtml}
+      ${whyHtml}
       <div class="ex-last">${lastStr}</div>
       <div class="set-rows">${buildSetRows(ex, lastData)}</div>
       <textarea class="ex-notes" placeholder="Notes…"></textarea>
@@ -1437,12 +1666,14 @@
     const dayType   = getDayType(blockName, today);
     const exercises = GYM_EXERCISES[dayType] || [];
 
-    // STAPLE check
-    const todayNames = exercises.map(e => e.name.toLowerCase());
-    const hasER      = todayNames.some(n => n.includes('external rotation'));
-    const hasWC      = todayNames.some(n => n.includes('wrist curl'));
-    if (!hasER || !hasWC) {
-      if (!confirm('STAPLE exercises not logged — are you sure?')) return;
+    // STAPLE check — only warn on days that include staple exercises
+    const staplesToday = exercises.filter(e => e.staple);
+    if (staplesToday.length > 0) {
+      const hasER = staplesToday.some(e => e.name.toLowerCase().includes('external rotation'));
+      const hasWC = staplesToday.some(e => e.name.toLowerCase().includes('wrist curl'));
+      if (!hasER || !hasWC) {
+        if (!confirm('STAPLE exercises missing from today\'s plan — are you sure?')) return;
+      }
     }
 
     const painScore   = parseInt(document.getElementById('pain-slider').value);
@@ -1530,6 +1761,518 @@
     document.getElementById('btn-complete-session').addEventListener('click', saveGymSession);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     MOBILITY LOGGER
+  ═══════════════════════════════════════════════════════════════════ */
+  const KEY_MOB_MEASUREMENTS = 'tt_mob_measurements';
+
+  const MOBILITY_DAILY = [
+    { id:'mob-d1',  name:'Seated band dorsiflexion',                   target:'2×15/side',              cue:'Pull toes toward shin' },
+    { id:'mob-d2',  name:'Hip flexor wall-assisted kneeling lunge',    target:'2×30–45s/side',           cue:'Squeeze rear glute, tuck pelvis, breathe' },
+    { id:'mob-d3',  name:'Prayer stretch',                             target:'2×30s',                   cue:'Gentle, pain-free' },
+    { id:'mob-d4',  name:'Reverse prayer stretch',                     target:'2×30s',                   cue:'Gentle, pain-free' },
+    { id:'mob-d5',  name:'Wrist CARs',                                 target:'5 circles each direction', cue:'Slow' },
+    { id:'mob-d6',  name:'Open-book thoracic rotation',                target:'2×8/side, 2–3s hold',     cue:'Rotation only — no wall angels', flag:'Mid-spine clinical finding: rotation and cat-cow only' },
+    { id:'mob-d7',  name:'Cat-cow',                                    target:'1×10',                    cue:'Smooth' },
+    { id:'mob-d8',  name:'Sleeper stretch',                            target:'2×30s/side',              cue:'Gentle, pain-free range only',   flag:'No forcing overhead' },
+    { id:'mob-d9',  name:'Wall-corner pec stretch',                    target:'2×30s/side',              cue:'' },
+    { id:'mob-d10', name:'Shoulder CARs',                              target:'Slow within comfortable range', cue:'' },
+  ];
+
+  const MOBILITY_WEEKLY = [
+    { id:'mob-w1', name:'90-90 hip switches',              target:'2×8/side',    cue:'Rotate knee to floor, controlled' },
+    { id:'mob-w2', name:'Figure-4 supine stretch',         target:'2×30s/side',  cue:'Draw knee in gently' },
+    { id:'mob-w3', name:'Pigeon',                          target:'2×30–45s/side', cue:'Hips square, breathe, never force' },
+    { id:'mob-w4', name:'Supine band hamstring stretch',   target:'2×30s/side',  cue:'Gentle, knee slightly soft', caution:'Proximal hamstring right — conservative' },
+    { id:'mob-w5', name:"Child's pose lat reach",          target:'2×30s/side',  cue:'Feel it down the ribs' },
+    { id:'mob-w6', name:'Standing side-bend lat stretch',  target:'2×30s/side',  cue:'' },
+    { id:'mob-w7', name:'Neck lateral tilt',               target:'2×20s/side',  cue:'No force, no pinching' },
+    { id:'mob-w8', name:'Neck rotation',                   target:'2× gentle reps/side', cue:'' },
+  ];
+
+  const MOBILITY_LOCKED = [
+    { id:'mob-l1', name:'Knee-to-wall ankle drill',                 note:'' },
+    { id:'mob-l2', name:'Eccentric heel drop',                      note:'' },
+    { id:'mob-l3', name:'Wall angel',                               note:'Sharp mid-spine pain on assessment' },
+    { id:'mob-l4', name:'Loaded thoracic extension',                note:'' },
+    { id:'mob-l5', name:'Forced end-range left shoulder overhead',  note:'' },
+  ];
+
+  const MOB_MEAS_FIELDS = [
+    { id:'ktw-l',    label:'Knee-to-wall L',    unit:'cm' },
+    { id:'ktw-r',    label:'Knee-to-wall R',    unit:'cm' },
+    { id:'toe',      label:'Toe-touch gap',      unit:'cm' },
+    { id:'sh-flex',  label:'Shoulder flexion',  unit:'°'  },
+    { id:'pig-l',    label:'Pigeon hip height L', unit:'cm' },
+    { id:'pig-r',    label:'Pigeon hip height R', unit:'cm' },
+  ];
+
+  function buildMobExRow(ex) {
+    const flagHtml = ex.flag ? `
+      <span class="mob-flag" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">⚑ FLAG</span>
+      <div class="mob-flag-body">${ex.flag}</div>` : '';
+    const cautionHtml = ex.caution ? `
+      <span class="mob-caution" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">⚠ CAUTION</span>
+      <div class="mob-caution-body">${ex.caution}</div>` : '';
+    return `<div class="mob-ex-row" data-ex-id="${ex.id}">
+      <label class="mob-ex-check">
+        <input type="checkbox" id="chk-${ex.id}" />
+      </label>
+      <div class="mob-ex-body">
+        <div class="mob-ex-name">${ex.name}</div>
+        <div class="mob-ex-target">${ex.target}</div>
+        ${ex.cue ? `<div class="mob-ex-cue">${ex.cue}</div>` : ''}
+        <div class="mob-ex-icons">${flagHtml}${cautionHtml}</div>
+        <div class="mob-ex-inputs">
+          <input type="number" placeholder="Hold (s)" min="0" max="999" />
+          <input type="text" placeholder="Notes…" />
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function buildLockedRow(ex, unlocked) {
+    if (unlocked) return buildMobExRow(ex);
+    return `<div class="mob-ex-row mob-locked-row" data-ex-id="${ex.id}"
+      onclick="alert('Unlock in Settings after physio 9 June')" style="cursor:pointer">
+      <div class="mob-lock-icon"><i class="fa-solid fa-lock" style="color:var(--text-sec);font-size:16px"></i></div>
+      <div class="mob-ex-body">
+        <div class="mob-ex-name">${ex.name}</div>
+        ${ex.note ? `<div style="font-size:11px;color:var(--danger);margin-top:2px">${ex.note}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function renderMobilityLogger() {
+    const physioCleared = !!loadSettings().physioCleared;
+    document.getElementById('mob-daily-list').innerHTML  = MOBILITY_DAILY.map(buildMobExRow).join('');
+    document.getElementById('mob-weekly-list').innerHTML = MOBILITY_WEEKLY.map(buildMobExRow).join('');
+    document.getElementById('mob-locked-list').innerHTML = MOBILITY_LOCKED.map(ex => buildLockedRow(ex, physioCleared)).join('');
+    renderMobMeasurements();
+  }
+
+  function loadMobMeasurements() {
+    try { return JSON.parse(localStorage.getItem(KEY_MOB_MEASUREMENTS) || '[]'); } catch { return []; }
+  }
+
+  function renderMobMeasurements() {
+    const all  = loadMobMeasurements();
+    const last = all.length ? all[all.length - 1] : null;
+    const grid = document.getElementById('mob-meas-grid');
+    grid.innerHTML = MOB_MEAS_FIELDS.map(f => {
+      const v = last ? (last[f.id] != null ? `${last[f.id]}${f.unit}` : '—') : '—';
+      const d = last ? formatDisplayDate(last.date) : 'Never logged';
+      return `<div class="mob-meas-field">
+        <label style="font-size:12px;font-weight:700;color:var(--text-sec);margin-bottom:2px">${f.label} (${f.unit})</label>
+        <div class="mob-meas-last">${v} · ${d}</div>
+      </div>`;
+    }).join('');
+
+    const btn  = document.getElementById('btn-log-measurements');
+    const form = document.getElementById('mob-meas-form');
+    const lastDate = last ? last.date : null;
+    const cutoff   = new Date(Date.now() - 28 * 86400000);
+    const showBtn  = !lastDate || new Date(lastDate + 'T00:00:00') <= cutoff;
+    btn.style.display = showBtn ? 'block' : 'none';
+
+    btn.onclick = () => {
+      if (form.style.display === 'block') { form.style.display = 'none'; return; }
+      form.style.display = 'block';
+      form.innerHTML = MOB_MEAS_FIELDS.map(f =>
+        `<div class="form-group">
+          <label>${f.label} (${f.unit})</label>
+          <input type="number" id="meas-${f.id}" step="0.5" min="0" placeholder="e.g. 10" />
+        </div>`
+      ).join('') + `<button class="btn btn-primary btn-full" onclick="saveMobMeasurements()">Save Measurements</button>`;
+    };
+  }
+
+  function saveMobMeasurements() {
+    const entry = { date: toDateStr(new Date()) };
+    MOB_MEAS_FIELDS.forEach(f => {
+      const v = parseFloat(document.getElementById('meas-' + f.id)?.value);
+      entry[f.id] = isNaN(v) ? null : v;
+    });
+    const all = loadMobMeasurements();
+    all.push(entry);
+    localStorage.setItem(KEY_MOB_MEASUREMENTS, JSON.stringify(all));
+    document.getElementById('mob-meas-form').style.display = 'none';
+    renderMobMeasurements();
+    alert('Measurements saved!');
+  }
+
+  function saveMobilitySession() {
+    const exercises = [...MOBILITY_DAILY, ...MOBILITY_WEEKLY].map(ex => {
+      const row    = document.querySelector(`[data-ex-id="${ex.id}"]`);
+      const inputs = row ? row.querySelectorAll('input[type="number"],input[type="text"]') : [];
+      return {
+        id:       ex.id,
+        name:     ex.name,
+        done:     document.getElementById('chk-' + ex.id)?.checked || false,
+        holdSecs: parseFloat(inputs[0]?.value) || null,
+        notes:    inputs[1]?.value || '',
+      };
+    });
+    const session = { date: toDateStr(new Date()), routine: 'General', exercises };
+    const all = loadSessions(KEY_MOB);
+    all.push(session);
+    localStorage.setItem(KEY_MOB, JSON.stringify(all));
+    const done = exercises.filter(e => e.done).length;
+    alert(`Mobility session saved! ${done}/${exercises.length} exercises completed.`);
+    renderDashboard();
+    navigateTo('screen-home');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     PROGRESS / BENCHMARKS
+  ═══════════════════════════════════════════════════════════════════ */
+  const KEY_HR           = 'tt_resting_hr';
+  const KEY_BENCH_DATA   = 'tt_bench_data';
+  const KEY_BENCH_HIST   = 'tt_bench_history';
+  let   _benchCharts     = {};
+
+  const BENCHMARKS_DEF = [
+    { id:'b-pullup',   name:'Strict pull-up max',          unit:'reps', baseline:5,    target:10,  lowerBetter:false },
+    { id:'b-deanhang', name:'Dead hang bilateral',          unit:'s',    baseline:49,   target:90,  lowerBetter:false },
+    { id:'b-cabler',   name:'Cable ER working weight',      unit:'kg',   baseline:6.25, target:10,  lowerBetter:false },
+    { id:'b-wristr',   name:'Reverse wrist working weight', unit:'kg',   baseline:5,    target:8,   lowerBetter:false },
+    { id:'b-dip',      name:'Dip max strict',               unit:'reps', baseline:4,    target:12,  lowerBetter:false },
+    { id:'b-ftp',      name:'FTP Wattbike',                 unit:'W',    baseline:172,  target:200, lowerBetter:false },
+    { id:'b-resthr',   name:'Resting HR',                   unit:'bpm',  baseline:75,   target:65,  lowerBetter:true  },
+  ];
+
+  function loadBenchData() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_DATA) || '{}'); } catch { return {}; } }
+  function saveBenchData(d) { localStorage.setItem(KEY_BENCH_DATA, JSON.stringify(d)); }
+
+  function loadBenchHistory() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_HIST) || '{}'); } catch { return {}; } }
+  function addBenchEntry(id, value) {
+    const all = loadBenchHistory();
+    if (!all[id]) all[id] = [];
+    all[id].push({ date: toDateStr(new Date()), value: parseFloat(value) });
+    localStorage.setItem(KEY_BENCH_HIST, JSON.stringify(all));
+  }
+
+  function benchPct(def, current) {
+    if (def.lowerBetter) {
+      const span = def.baseline - def.target;
+      return span > 0 ? Math.min(100, Math.max(0, ((def.baseline - current) / span) * 100)) : 0;
+    }
+    const span = def.target - def.baseline;
+    return span > 0 ? Math.min(100, Math.max(0, ((current - def.baseline) / span) * 100)) : 0;
+  }
+
+  function loadHrData() { try { return JSON.parse(localStorage.getItem(KEY_HR) || '[]'); } catch { return []; } }
+
+  function renderProgress() {
+    renderHrDisplay();
+    renderBenchCards();
+    renderZone2History();
+  }
+
+  function renderHrDisplay() {
+    const todayStr = toDateStr(new Date());
+    const entry    = loadHrData().find(e => e.date === todayStr);
+    const el = document.getElementById('hr-today-display');
+    if (!el) return;
+    if (entry) {
+      el.innerHTML = `<div class="hr-today-val">${entry.value} <span style="font-size:16px;font-weight:600">bpm</span></div><div class="hr-today-lbl">Logged today</div>`;
+      const inp = document.getElementById('hr-input');
+      if (inp) inp.value = entry.value;
+    } else {
+      el.innerHTML = `<div class="hr-today-lbl" style="padding:8px 0">Not logged today</div>`;
+    }
+  }
+
+  function saveHrEntry(value) {
+    const data = loadHrData();
+    const todayStr = toDateStr(new Date());
+    const idx = data.findIndex(e => e.date === todayStr);
+    if (idx >= 0) data[idx].value = value; else data.push({ date: todayStr, value });
+    localStorage.setItem(KEY_HR, JSON.stringify(data));
+    addBenchEntry('b-resthr', value);
+    const d = loadBenchData(); d['b-resthr'] = value; saveBenchData(d);
+    renderHrDisplay();
+    renderBenchCards();
+  }
+
+  function renderBenchCards() {
+    const list = document.getElementById('bench-cards-list');
+    if (!list) return;
+    Object.values(_benchCharts).forEach(c => { try { c.destroy(); } catch {} });
+    _benchCharts = {};
+
+    const data = loadBenchData();
+    const hist = loadBenchHistory();
+
+    list.innerHTML = BENCHMARKS_DEF.map(def => {
+      const current = data[def.id] != null ? data[def.id] : def.baseline;
+      const pct = Math.round(benchPct(def, current));
+      const history = (hist[def.id] || []).slice(-10);
+      const hasSparkline = history.length >= 2;
+      return `<div class="card">
+        <div class="card-title">${def.name}</div>
+        <div class="bench-vals">
+          <div class="bench-val-group">
+            <div class="bench-val-label">Baseline</div>
+            <div class="bench-val-static" style="color:var(--text-sec)">${def.baseline}<span style="font-size:12px"> ${def.unit}</span></div>
+          </div>
+          <div class="bench-val-group grow">
+            <div class="bench-val-label">Current</div>
+            <div class="bench-current-wrap">
+              <input type="number" step="0.25" value="${current}"
+                onchange="updateBenchValue('${def.id}',this.value)"
+                id="bench-${def.id}" />
+              <span class="bench-unit">${def.unit}</span>
+            </div>
+          </div>
+          <div class="bench-val-group">
+            <div class="bench-val-label">Target</div>
+            <div class="bench-val-static" style="color:var(--success)">${def.target}<span style="font-size:12px"> ${def.unit}</span></div>
+          </div>
+        </div>
+        <div class="bench-progress-bar">
+          <div class="bench-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="bench-progress-pct">${pct}% to target${def.lowerBetter ? ' (lower = better)' : ''}</div>
+        ${hasSparkline ? `<div class="bench-sparkline-wrap"><canvas id="spark-${def.id}"></canvas></div>` : ''}
+      </div>`;
+    }).join('');
+
+    BENCHMARKS_DEF.forEach(def => {
+      const history = (hist[def.id] || []).slice(-10);
+      if (history.length < 2) return;
+      const canvas = document.getElementById('spark-' + def.id);
+      if (!canvas) return;
+      _benchCharts[def.id] = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: history.map(e => e.date.slice(5)),
+          datasets: [{ data: history.map(e => e.value), borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.12)', borderWidth:2, pointRadius:3, pointBackgroundColor:'#4a7c59', tension:0.3, fill:true }],
+        },
+        options: {
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ display:false } },
+          scales:{ x:{ display:false }, y:{ display:false } },
+        },
+      });
+    });
+  }
+
+  function updateBenchValue(id, raw) {
+    const val = parseFloat(raw);
+    if (isNaN(val)) return;
+    const d = loadBenchData(); d[id] = val; saveBenchData(d);
+    addBenchEntry(id, val);
+    renderBenchCards();
+  }
+
+  function renderZone2History() {
+    const rows = [];
+    loadSessions(KEY_GYM).forEach(s => {
+      if (s.zone2?.duration) rows.push({ date:s.date, modality:s.zone2.modality||'Bike', duration:s.zone2.duration, avgHR:s.zone2.avgHR });
+    });
+    rows.sort((a,b) => b.date.localeCompare(a.date));
+    const tbody = document.getElementById('z2-history-body');
+    const empty = document.getElementById('z2-empty');
+    if (!tbody) return;
+    if (!rows.length) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = rows.map(r => `<tr>
+      <td style="white-space:nowrap">${formatDisplayDate(r.date)}</td>
+      <td>${r.modality}</td>
+      <td>${r.duration} min</td>
+      <td>${r.avgHR ? r.avgHR + ' bpm' : '—'}</td>
+    </tr>`).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     OVERLOAD TRACKING
+  ═══════════════════════════════════════════════════════════════════ */
+  const PULL_IDS = new Set(['ua-pullup','ua-ext-rot','ua-latpd','ua-srow','ua-facepull',
+    'ub-dbrow','ub-ext-rot','ub-scappu','uc-chinup','uc-ext-rot','uc-latpd','uc-srow',
+    'uc-hlr','ep-ext-rot','ep-slyder']);
+  const PUSH_IDS = new Set(['ub-adip','ub-csrow','uc-dbpress']);
+
+  let _olWeightChart = null;
+  let _olSelectSeeded = false;
+
+  function getAllExercises() {
+    const seen = new Set(), list = [];
+    Object.values(GYM_EXERCISES).forEach(arr => arr.forEach(ex => {
+      if (ex.type === 'zone2' || seen.has(ex.id)) return;
+      seen.add(ex.id);
+      list.push({ id:ex.id, name:ex.name, repRange:ex.repRange, inc:ex.inc, type:ex.type });
+    }));
+    return list;
+  }
+
+  function getExSessions(exId) {
+    return loadSessions(KEY_GYM)
+      .filter(s => s.exercises?.some(e => e.id === exId && e.sets?.length))
+      .map(s => {
+        const ex = s.exercises.find(e => e.id === exId);
+        return { date:s.date, sets:ex.sets, notes:ex.notes||'', progressionFlag:ex.progressionFlag||false };
+      })
+      .sort((a,b) => b.date.localeCompare(a.date));
+  }
+
+  function renderOverload() {
+    const sel = document.getElementById('ol-exercise-select');
+    if (!sel) return;
+    if (!_olSelectSeeded) {
+      getAllExercises().forEach(ex => {
+        const o = document.createElement('option');
+        o.value = ex.id; o.textContent = ex.name;
+        sel.appendChild(o);
+      });
+      sel.addEventListener('change', renderOverloadForExercise);
+      _olSelectSeeded = true;
+    }
+    renderOverloadForExercise();
+    renderStallAlerts();
+    renderPullPushRatio();
+  }
+
+  function renderOverloadForExercise() {
+    const sel = document.getElementById('ol-exercise-select');
+    if (!sel) return;
+    const exId    = sel.value;
+    const sessions = exId ? getExSessions(exId) : [];
+    const tbody   = document.getElementById('ol-history-body');
+    const empty   = document.getElementById('ol-history-empty');
+
+    if (!sessions.length) {
+      if (tbody) tbody.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+    } else {
+      if (empty) empty.style.display = 'none';
+      if (tbody) tbody.innerHTML = sessions.map(s => {
+        const setCells = [0,1,2,3].map(i => {
+          const st = s.sets[i];
+          if (!st) return '<td style="color:var(--text-sec)">—</td>';
+          const v = st.secs != null ? `${st.secs}s` : `${st.weight}×${st.reps}`;
+          return `<td>${v}</td>`;
+        }).join('');
+        const rirs = s.sets.filter(st => st.rir !== undefined).map(st => parseFloat(st.rir)||0);
+        const avgRir = rirs.length ? (rirs.reduce((a,b)=>a+b,0)/rirs.length).toFixed(1) : '—';
+        return `<tr>
+          <td style="white-space:nowrap">${formatDisplayDate(s.date)}</td>
+          ${setCells}
+          <td>${avgRir}</td>
+          <td style="max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.notes||''}">${s.notes||'—'}</td>
+          <td class="${s.progressionFlag ? 'ol-progressed' : ''}">${s.progressionFlag ? '↑' : ''}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Weight chart
+    if (_olWeightChart) { try { _olWeightChart.destroy(); } catch {} _olWeightChart = null; }
+    const canvas = document.getElementById('ol-weight-chart');
+    if (canvas && sessions.length >= 2) {
+      const sorted  = sessions.slice().reverse();
+      const labels  = sorted.map(s => s.date.slice(5));
+      const weights = sorted.map(s => { const w = parseFloat(s.sets[0]?.weight); return isNaN(w) ? null : w; });
+      if (weights.some(w => w !== null)) {
+        _olWeightChart = new Chart(canvas, {
+          type:'line',
+          data:{ labels, datasets:[{ data:weights, borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.1)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#4a7c59', tension:0.2, fill:true }] },
+          options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{ x:{ ticks:{ font:{ size:10 }, maxRotation:0 }, grid:{ display:false } }, y:{ ticks:{ font:{ size:11 } } } },
+          },
+        });
+      }
+    }
+
+    renderProgressionStatus(exId, sessions);
+  }
+
+  function renderProgressionStatus(exId, sessions) {
+    const sec = document.getElementById('ol-status-section');
+    if (!sec) return;
+    if (!sessions.length) { sec.innerHTML = ''; return; }
+
+    const exDef = getAllExercises().find(e => e.id === exId);
+    if (!exDef) { sec.innerHTML = ''; return; }
+
+    const latest        = sessions[0];
+    const currentWeight = latest.sets[0]?.weight ?? '—';
+    const repRangeStr   = exDef.repRange ? `${exDef.repRange[0]}–${exDef.repRange[1]}` : 'N/A';
+
+    let sessionsAtWeight = 0;
+    for (const s of sessions) {
+      if (String(s.sets[0]?.weight) === String(currentWeight)) sessionsAtWeight++;
+      else break;
+    }
+
+    let statusClass = 'ol-status-building', statusText = 'Building reps', statusIcon = 'fa-dumbbell';
+    if (latest.progressionFlag) {
+      statusClass = 'ol-status-ready'; statusText = 'Ready to progress'; statusIcon = 'fa-arrow-trend-up';
+    } else if (sessions.length >= 2 && sessions[1].progressionFlag) {
+      statusClass = 'ol-status-settling'; statusText = 'Just progressed — settling'; statusIcon = 'fa-clock';
+    }
+
+    const inc  = exDef.inc || 2.5;
+    const wNum = parseFloat(currentWeight);
+    const nextW = !isNaN(wNum) ? +(wNum + inc).toFixed(2) : null;
+
+    sec.innerHTML = `<div class="card">
+      <div class="card-title">Progression Status</div>
+      <div class="ol-status-badge ${statusClass}"><i class="fa-solid ${statusIcon}"></i> ${statusText}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="stat-box"><div class="val">${currentWeight}${!isNaN(wNum)?' kg':''}</div><div class="lbl">Current weight</div></div>
+        <div class="stat-box"><div class="val">${repRangeStr} reps</div><div class="lbl">Rep range</div></div>
+        <div class="stat-box"><div class="val">${sessionsAtWeight}</div><div class="lbl">Sessions at weight</div></div>
+        <div class="stat-box"><div class="val">${nextW !== null ? nextW+' kg' : '—'}</div><div class="lbl">Suggested next</div></div>
+      </div>
+    </div>`;
+  }
+
+  function renderStallAlerts() {
+    const list = document.getElementById('ol-stalls-list');
+    if (!list) return;
+    const stalls = [];
+    getAllExercises().forEach(ex => {
+      const sessions = getExSessions(ex.id);
+      if (sessions.length < 3) return;
+      const last3 = sessions.slice(0, 3);
+      const w0 = last3[0].sets[0]?.weight;
+      if (w0 == null) return;
+      if (last3.every(s => String(s.sets[0]?.weight) === String(w0)) && last3.every(s => !s.progressionFlag)) {
+        stalls.push({ name:ex.name, weight:w0 });
+      }
+    });
+    if (!stalls.length) {
+      list.innerHTML = `<div style="font-size:13px;color:var(--text-sec);padding:8px 0">No stalls detected — keep going!</div>`;
+      return;
+    }
+    list.innerHTML = stalls.map(s => `<div class="ol-stall-card">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>
+        <div class="ol-stall-name">${s.name}</div>
+        <div class="ol-stall-sub">3+ sessions at ${s.weight}${!isNaN(parseFloat(s.weight))?' kg':''} — consider progression or deload</div>
+      </div>
+    </div>`).join('');
+  }
+
+  function renderPullPushRatio() {
+    let pull = 0, push = 0;
+    loadSessions(KEY_GYM).forEach(s => {
+      (s.exercises||[]).forEach(ex => {
+        const n = ex.sets?.length || 0;
+        if (PULL_IDS.has(ex.id)) pull += n;
+        else if (PUSH_IDS.has(ex.id)) push += n;
+      });
+    });
+    const ratio   = push > 0 ? (pull / push).toFixed(1) : pull > 0 ? '∞' : '0';
+    const isGreen = push > 0 && (pull / push) >= 2.0;
+    const display = document.getElementById('pp-ratio-display');
+    const detail  = document.getElementById('pp-ratio-detail');
+    if (display) { display.textContent = (ratio !== '0' && ratio !== '∞') ? `${ratio}:1` : ratio; display.className = `pp-ratio ${isGreen ? 'green' : 'red'}`; }
+    if (detail)  detail.textContent = `${pull} pulling sets : ${push} pushing sets${push > 0 ? ` — ratio ${ratio}:1` : ''}`;
+  }
+
   /* ─── INIT ──────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1541,6 +2284,17 @@
     });
     initSettings();
     initGymLogger();
+
+    // Mobility complete button
+    document.getElementById('btn-complete-mobility').addEventListener('click', saveMobilitySession);
+
+    // Progress HR button
+    document.getElementById('btn-log-hr').addEventListener('click', () => {
+      const val = parseFloat(document.getElementById('hr-input').value);
+      if (isNaN(val) || val < 30 || val > 200) { alert('Please enter a valid HR (30–200 bpm)'); return; }
+      saveHrEntry(val);
+    });
+
     renderDashboard();
   });
 </script>
