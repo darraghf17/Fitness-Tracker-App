@@ -605,6 +605,8 @@
     .cta-card i { font-size: 28px; }
     .cta-gym      { background: var(--primary); color: #fff; }
     .cta-mobility { background: var(--amber);   color: #fff; }
+    .cta-done     { background: var(--primary-lt) !important; color: var(--primary) !important; box-shadow: none; cursor: default; }
+    .cta-done:active { transform: none !important; opacity: 1 !important; }
 
     .section-label {
       font-size: 12px;

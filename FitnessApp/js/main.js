@@ -24,6 +24,33 @@
     document.getElementById('gym-streak').textContent = `🔥 ${calcStreak(gymSessions)} gym`;
     document.getElementById('mob-streak').textContent = `🔥 ${calcStreak(mobSessions)} mobility`;
 
+    const gymDoneToday = gymSessions.some(s => s.date === todayStr);
+    const mobDoneToday = mobSessions.some(s => s.date === todayStr);
+    const ctaGym = document.querySelector('.cta-gym');
+    const ctaMob = document.querySelector('.cta-mobility');
+    if (ctaGym) {
+      if (gymDoneToday) {
+        ctaGym.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Gym Complete</span>';
+        ctaGym.classList.add('cta-done');
+        ctaGym.onclick = null;
+      } else {
+        ctaGym.innerHTML = '<i class="fa-solid fa-dumbbell"></i><span>Log Gym Session</span>';
+        ctaGym.classList.remove('cta-done');
+        ctaGym.onclick = () => navigateTo('screen-gym');
+      }
+    }
+    if (ctaMob) {
+      if (mobDoneToday) {
+        ctaMob.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Mobility Complete</span>';
+        ctaMob.classList.add('cta-done');
+        ctaMob.onclick = null;
+      } else {
+        ctaMob.innerHTML = '<i class="fa-solid fa-person-running"></i><span>Log Mobility</span>';
+        ctaMob.classList.remove('cta-done');
+        ctaMob.onclick = () => navigateTo('screen-mobility');
+      }
+    }
+
     const lastGym = gymSessions.length ? gymSessions[gymSessions.length - 1] : null;
     const lastMob = mobSessions.length ? mobSessions[mobSessions.length - 1] : null;
 
