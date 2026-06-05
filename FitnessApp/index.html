@@ -81,6 +81,7 @@
       <h1 id="gym-screen-title">Gym Logger</h1>
       <p id="gym-screen-sub">Loading today's session…</p>
     </div>
+    <div id="gym-duration-banner" class="session-est" style="display:none"></div>
 
     <!-- Check-in -->
     <div class="card">
@@ -159,12 +160,12 @@
       <div class="mob-progress-bar-track"><div id="mob-progress-fill" class="mob-progress-bar-fill" style="width:0%"></div></div>
     </div>
 
-    <!-- Daily Staples -->
-    <div class="mob-section-label">Daily Staples</div>
+    <!-- Essentials -->
+    <div class="mob-section-label">Daily Essentials</div>
     <div class="card" id="mob-daily-list"></div>
 
-    <!-- Today's Deeper Work -->
-    <div class="mob-section-label">Today's Deeper Work</div>
+    <!-- Today's rotation -->
+    <div class="mob-section-label">Today's Focus</div>
     <div class="card" id="mob-deeper-list"></div>
 
   </section>
@@ -226,11 +227,11 @@
       <div style="overflow-x:auto">
         <table class="ol-history-table">
           <thead>
-            <tr><th>Date</th><th>Set 1</th><th>Set 2</th><th>Set 3</th><th>Set 4</th><th>Avg RIR</th><th>Notes</th><th>↑</th></tr>
+            <tr><th>Date</th><th>Set 1</th><th>Set 2</th><th>Set 3</th><th>Set 4</th><th>Avg Effort</th><th>Notes</th><th>↑</th></tr>
           </thead>
           <tbody id="ol-history-body"></tbody>
         </table>
-        <div id="ol-history-empty" style="display:none;font-size:13px;color:var(--text-sec);padding:12px 0">No sessions logged for this exercise yet.</div>
+        <div id="ol-history-empty" style="display:none;font-size:13px;color:var(--text-sec);padding:12px 0">No sessions logged for this exercise yet — try selecting a different exercise, or log a session first.</div>
       </div>
     </div>
 

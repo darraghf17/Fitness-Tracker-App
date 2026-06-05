@@ -3,18 +3,52 @@
   ═══════════════════════════════════════════════════════════════════ */
   const KEY_MOB_PROG = 'tt_mob_prog';
 
-  /* Daily staples — appear every day without exception */
-  const MOB_DAILY_STAPLES = [
+  /* ── Date-seeded shuffle (same result each calendar day) ─────── */
+  function _dateSeed(dateStr) {
+    return dateStr.split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 0);
+  }
+  function _seededShuffle(arr, seed) {
+    const a = [...arr]; let s = seed >>> 0;
+    for (let i = a.length - 1; i > 0; i--) {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+      const j = s % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* 4 non-negotiable daily essentials (always shown) */
+  const MOB_ESSENTIALS = [
     { id:'mob-d1',  name:'Seated band dorsiflexion',               target:'2 × 15 reps/side' },
-    { id:'mob-d2',  name:'Hip flexor wall-assisted kneeling lunge', target:'2 × 30–45s/side' },
+    { id:'mob-d2',  name:'Hip flexor wall-assisted kneeling lunge', target:'2 × 45s/side' },
+    { id:'mob-d6',  name:'Open-book thoracic rotation',             target:'2 × 8/side', flag:'Mid-spine clinical finding: rotation and cat-cow only' },
+    { id:'mob-d10', name:'Shoulder CARs',                           target:'Slow, within comfortable range' },
+  ];
+
+  /* Rotating pool — 6 selected daily via date seed */
+  const MOB_POOL = [
+    // Shoulder / upper body
     { id:'mob-d3',  name:'Prayer stretch',                          target:'2 × 30s' },
     { id:'mob-d4',  name:'Reverse prayer stretch',                  target:'2 × 30s' },
     { id:'mob-d5',  name:'Wrist CARs',                              target:'5 circles each direction' },
-    { id:'mob-d6',  name:'Open-book thoracic rotation',             target:'2 × 8/side', flag:'Mid-spine clinical finding: rotation and cat-cow only' },
     { id:'mob-d7',  name:'Cat-cow',                                 target:'1 × 10' },
-    { id:'mob-d8',  name:'Sleeper stretch',                         target:'2 × 30s/side',  flag:'No forcing overhead' },
+    { id:'mob-d8',  name:'Sleeper stretch',                         target:'2 × 30s/side', flag:'No forcing overhead' },
     { id:'mob-d9',  name:'Wall-corner pec stretch',                 target:'2 × 30s/side' },
-    { id:'mob-d10', name:'Shoulder CARs',                           target:'Slow, within comfortable range' },
+    { id:'mob-w5',  name:"Child's pose lat reach",                  target:'2 × 45s/side' },
+    { id:'mob-w6',  name:'Standing side-bend lat stretch',          target:'2 × 45s/side' },
+    { id:'mob-w7',  name:'Neck lateral tilt',                       target:'2 × 30s/side' },
+    { id:'mob-w8',  name:'Neck rotation',                           target:'2 × 10/side' },
+    // Hip / lower body
+    { id:'mob-w1',  name:'90-90 hip switches',                      target:'2 × 8/side' },
+    { id:'mob-w2',  name:'Figure-4 supine stretch',                 target:'2 × 45s/side' },
+    { id:'mob-w3',  name:'Pigeon pose',                             target:'2 × 45s/side' },
+    { id:'mob-w4',  name:'Supine band hamstring stretch',           target:'2 × 45s/side', caution:'Right side conservative' },
+    // Leg flexibility (goal area)
+    { id:'mob-leg1', name:'Standing quad stretch',                  target:'2 × 45s/side' },
+    { id:'mob-leg2', name:'Kneeling adductor stretch',              target:'2 × 45s/side' },
+    { id:'mob-leg3', name:'Calf-soleus deep stretch',               target:'2 × 45s/side' },
+    { id:'mob-leg4', name:'Long-sit hamstring stretch',             target:'2 × 45s', caution:'Right side conservative — ease into it' },
+    { id:'mob-leg5', name:'Deep frog stretch',                      target:'2 × 45s' },
   ];
 
   /* Day info: type, duration, rationale — keyed by day-of-week (0=Sun) */
@@ -28,58 +62,6 @@
     6: { name:'Saturday',  type:'Rest day',            duration:'~30 min', rationale:"Medium full-body session — rest day, longer holds, more volume" },
   };
 
-  /* Deeper work per day-of-week (0=Sun … 6=Sat) */
-  const MOB_DEEPER_WORK = {
-    1: [ // Monday — Upper gym day
-      { id:'mob-w1', name:'90-90 hip switches',            target:'2 × 8/side',   rationale:'Hip external rotation work requiring no upper body — complements the pulling from this morning' },
-      { id:'mob-w2', name:'Figure-4 supine stretch',       target:'2 × 30s/side', rationale:'Passive glute and hip rotator release after sitting and a gym session' },
-      { id:'mob-w4', name:'Supine band hamstring stretch', target:'2 × 30s/side', rationale:'Conservative hamstring lengthening — gentle enough after a gym day, important for proximal hamstring tendinopathy management', caution:'Right side conservative' },
-      { id:'mob-w7', name:'Neck lateral tilt',             target:'2 × 20s/side', rationale:'Upper trap and scalene release after a pulling session and a desk day — assessment showed a 5 cm lateral tilt deficit' },
-    ],
-    2: [ // Tuesday — Engine day
-      { id:'mob-w3', name:'Pigeon pose',                   target:'2 × 45s/side', rationale:'Deepest hip external rotation work of the week — ideal on an engine day when the upper body is fresh and hips have been working' },
-      { id:'mob-w1', name:'90-90 hip switches',            target:'2 × 8/side',   rationale:'Active hip rotation to complement the passive pigeon work' },
-      { id:'mob-w5', name:"Child's pose lat reach",        target:'2 × 30s/side', rationale:'Lat flexibility work while the upper body is in recovery — no loading, just lengthening' },
-      { id:'mob-w8', name:'Neck rotation',                 target:'2 × 8/side',   rationale:'Cervical mobility to pair with the upper trap work from the thoracic staples' },
-    ],
-    3: [ // Wednesday — Upper gym day
-      { id:'mob-w2', name:'Figure-4 supine stretch',       target:'2 × 30s/side', rationale:'Passive hip work requiring no upper body — a heavy rowing day means arms and shoulders need rest' },
-      { id:'mob-w1', name:'90-90 hip switches',            target:'2 × 8/side',   rationale:'Active hip rotation, third session of the week building the pattern' },
-      { id:'mob-w6', name:'Standing side-bend lat stretch',target:'2 × 30s/side', rationale:'Lat lengthening in a standing position — less demanding on the shoulders, directly feeds into overhead reach restriction' },
-      { id:'mob-w4', name:'Supine band hamstring stretch', target:'2 × 30s/side', rationale:'Second hamstring session of the week — same conservative approach', caution:'Right side conservative' },
-    ],
-    4: [ // Thursday — Engine day
-      { id:'mob-w3', name:'Pigeon pose',                   target:'2 × 45s/side', rationale:'Second pigeon session — Tuesday and Thursday pigeon gives the frequency needed to shift the bilateral hip external rotation restriction confirmed in your assessment' },
-      { id:'mob-w5', name:"Child's pose lat reach",        target:'2 × 30s/side', rationale:'Lat flexibility is a priority for overhead reach — twice weekly is the minimum needed to make progress' },
-      { id:'mob-w2', name:'Figure-4 supine stretch',       target:'2 × 30s/side', rationale:'Third hip session of the week, passive and restorative after an engine day' },
-      { id:'mob-w7', name:'Neck lateral tilt',             target:'2 × 20s/side', rationale:"Second neck session of the week — pairing with Thursday's prehab focus in the gym" },
-    ],
-    5: [ // Friday — Upper gym day
-      { id:'mob-w1', name:'90-90 hip switches',            target:'2 × 8/side',   rationale:'Fourth hip rotation session of the week — frequency is what shifts external rotation restriction' },
-      { id:'mob-w6', name:'Standing side-bend lat stretch',target:'2 × 30s/side', rationale:'Second lat session — going into the weekend when the body is most ready for deeper work' },
-      { id:'mob-w4', name:'Supine band hamstring stretch', target:'2 × 30s/side', rationale:'Third hamstring session — conservative as always', caution:'Right side conservative' },
-      { id:'mob-w8', name:'Neck rotation',                 target:'2 × 8/side',   rationale:'End of the working week cervical mobility — five days of desk work creates significant upper trap and scalene tightness' },
-    ],
-    6: [ // Saturday — Rest day
-      { id:'mob-w3', name:'Pigeon pose',                   target:'2 × 45s/side', rationale:'Third pigeon session of the week on a rest day — no gym fatigue, full attention on the stretch' },
-      { id:'mob-w1', name:'90-90 hip switches',            target:'2 × 10/side',  rationale:'Slightly more volume on a rest day — fifth hip rotation session of the week' },
-      { id:'mob-w5', name:"Child's pose lat reach",        target:'2 × 45s/side', rationale:'Longer holds on a rest day — more time to work into the lat restriction that caps overhead climbing positions' },
-      { id:'mob-w6', name:'Standing side-bend lat stretch',target:'2 × 45s/side', rationale:'Third lat session, longer holds on rest day' },
-      { id:'mob-w4', name:'Supine band hamstring stretch', target:'2 × 45s/side', rationale:'Longer conservative hold on a rest day — no gym fatigue to manage', caution:'Right side conservative' },
-      { id:'mob-w7', name:'Neck lateral tilt',             target:'2 × 30s/side', rationale:'Longer holds on rest day — addressing the 5 cm lateral tilt deficit from your assessment' },
-      { id:'mob-w8', name:'Neck rotation',                 target:'2 × 10/side',  rationale:'More volume on rest day — full cervical mobility session' },
-    ],
-    0: [ // Sunday — Full rest day
-      { id:'mob-w3', name:'Pigeon pose',                   target:'3 × 60s/side', rationale:'Maximum duration pigeon on the most recovered day — this is where real hip external rotation gains happen' },
-      { id:'mob-w1', name:'90-90 hip switches',            target:'3 × 10/side',  rationale:'Active hip rotation to complement the long passive pigeon holds — more sets on Sunday' },
-      { id:'mob-w2', name:'Figure-4 supine stretch',       target:'3 × 45s/side', rationale:'Three sets on Sunday — working the deep hip rotators from both active and passive angles' },
-      { id:'mob-w5', name:"Child's pose lat reach",        target:'3 × 45s/side', rationale:'Three sets with long holds — most lat lengthening work of the week on the most recovered day' },
-      { id:'mob-w6', name:'Standing side-bend lat stretch',target:'3 × 45s/side', rationale:'Third lat exercise on Sunday — approaching lat flexibility from three angles in one session' },
-      { id:'mob-w4', name:'Supine band hamstring stretch', target:'3 × 45s/side', rationale:'Three sets with careful attention to the right side', caution:'Right side conservative' },
-      { id:'mob-w7', name:'Neck lateral tilt',             target:'3 × 30s/side', rationale:'Addressing the neck deficit with maximum weekly volume on the most recovered day' },
-      { id:'mob-w8', name:'Neck rotation',                 target:'3 × 10/side',  rationale:'Full cervical mobility session — end of the week reset before Monday starts again' },
-    ],
-  };
 
   /* Physio-locked deeper work per day (shown greyed/padlocked until physio toggle on) */
   const MOB_LOCKED_DEEPER = {
@@ -994,6 +976,179 @@
       }
     }
 
+    /* ── Leg flexibility exercises ─────────────────────────────── */
+    'mob-leg1': {
+      svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="180" x2="280" y2="180" stroke="#ccc" stroke-width="1.5"/>
+  <circle cx="120" cy="40" r="14" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2.5"/>
+  <line x1="120" y1="54" x2="120" y2="80" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- standing leg -->
+  <line x1="120" y1="80" x2="110" y2="130" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="110" y1="130" x2="110" y2="178" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- bent leg -->
+  <line x1="120" y1="80" x2="130" y2="120" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="130" y1="120" x2="125" y2="80" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- hand holding ankle -->
+  <line x1="120" y1="65" x2="138" y2="90" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="128" cy="82" r="5" fill="#4a7c59"/>
+  <text x="155" y="115" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">Quad</text>
+  <text x="155" y="128" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">stretch</text>
+  <path d="M150,120 Q135,110 133,95" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-leg)"/>
+  <defs><marker id="ar-leg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
+</svg>`,
+      steps: [
+        'Stand tall near a wall for balance. Bend one knee, bringing your heel toward your glutes.',
+        'Grasp the ankle with the same-side hand. Keep your knees together.',
+        'Tuck your pelvis slightly (posterior pelvic tilt) to increase the stretch through the rectus femoris.',
+        'Hold 45 seconds, breathing steadily. Switch sides.',
+        'If you cannot reach your ankle, loop a strap or towel around it.',
+      ],
+      feel: 'A strong pull along the front of the thigh from knee to hip. No knee pain. The stretch should deepen when you tuck the pelvis.',
+      prog: {
+        ready: 'You can hold for 60 seconds comfortably on both sides with heel touching glutes and knees aligned.',
+        next: 'Add a hip flexor bias: lunge position with the back knee on the floor, then pull the ankle back while driving the hip forward.',
+        goal: 'Full knee flexion range and symmetrical quad length — both sides reaching 120° passive knee flexion.',
+        time: '6–10 weeks of daily work to notice meaningful change in quad flexibility.'
+      }
+    },
+
+    'mob-leg2': {
+      svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="175" x2="280" y2="175" stroke="#ccc" stroke-width="1.5"/>
+  <!-- person kneeling, one leg to side -->
+  <circle cx="150" cy="50" r="14" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2.5"/>
+  <line x1="150" y1="64" x2="150" y2="100" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- kneeling leg -->
+  <line x1="150" y1="100" x2="160" y2="140" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="160" y1="140" x2="170" y2="172" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- side leg -->
+  <line x1="150" y1="100" x2="90" y2="130" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="90" y1="130" x2="72" y2="172" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <defs><marker id="ar-add" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
+  <path d="M115,155 Q100,140 95,128" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-add)"/>
+  <text x="185" y="130" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">Adductor</text>
+  <text x="185" y="143" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">stretch</text>
+</svg>`,
+      steps: [
+        'Start on all fours. Slide one leg out to the side as far as comfortable, toes pointing out.',
+        'Lower your hips toward the floor. Keep the grounded knee over the toes.',
+        'Rock gently side to side to find the deepest comfortable position, then hold.',
+        'Hold 45 seconds per side. Use hands on the floor for support.',
+        'Increase the range gradually over weeks — never force through sharp groin pain.',
+      ],
+      feel: 'A deep stretch along the inner thigh from groin to knee. No sharp knee pain.',
+      prog: {
+        ready: 'You can hold 60 seconds per side with the hip dropping close to the floor without discomfort.',
+        next: 'Move toward a full side split — measure how far apart your feet are monthly.',
+        goal: 'Enough adductor length for comfortable stemming positions and high foot placements on the wall.',
+        time: '8–12 weeks to notice meaningful improvement in inner thigh flexibility.'
+      }
+    },
+
+    'mob-leg3': {
+      svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="185" x2="280" y2="185" stroke="#ccc" stroke-width="1.5"/>
+  <circle cx="80" cy="60" r="14" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2.5"/>
+  <line x1="80" y1="74" x2="80" y2="105" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- front leg bent -->
+  <line x1="80" y1="105" x2="100" y2="145" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="100" y1="145" x2="105" y2="183" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- back leg -->
+  <line x1="80" y1="105" x2="55" y2="145" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="55" y1="145" x2="50" y2="183" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- wall/step -->
+  <rect x="95" y="155" width="20" height="28" rx="2" fill="#e8f2ec" stroke="#4a7c59" stroke-width="1.5"/>
+  <text x="130" y="110" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">Bent knee</text>
+  <text x="130" y="123" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">calf stretch</text>
+  <defs><marker id="ar-calf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
+  <path d="M125,160 Q115,162 107,165" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-calf)"/>
+</svg>`,
+      steps: [
+        'Stand facing a wall. Place the ball of the foot of the target leg on the wall or a step.',
+        'Bend the knee of the target leg, pressing it toward the wall. Keep the heel on the floor.',
+        'This bent-knee position specifically targets the soleus (deeper calf muscle).',
+        'Hold 45 seconds. You should feel the stretch lower in the calf and above the heel.',
+        'Increase the knee bend angle gradually for more stretch over weeks.',
+      ],
+      feel: 'A deep stretch low in the calf — lower than a straight-leg calf stretch. Some pull toward the Achilles tendon area.',
+      prog: {
+        ready: 'Knee tracks to the wall with 5+ cm between the toe and wall, heel stays flat, no calf tightness limiting range.',
+        next: 'Progress to 3 sets. Add eccentric heel drops (after physio clearance) to complement the passive stretch.',
+        goal: 'Symmetrical dorsiflexion — 10+ cm knee-to-wall test on both sides, resolving the 3 cm bilateral deficit.',
+        time: '6–8 weeks combined with ankle drills for the dorsiflexion restriction.'
+      }
+    },
+
+    'mob-leg4': {
+      svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="180" x2="280" y2="180" stroke="#ccc" stroke-width="1.5"/>
+  <!-- seated forward fold -->
+  <circle cx="80" cy="80" r="14" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2.5"/>
+  <!-- torso leaning forward -->
+  <line x1="80" y1="94" x2="80" y2="120" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="80" y1="100" x2="200" y2="130" stroke="#4a7c59" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- legs straight -->
+  <line x1="80" y1="120" x2="220" y2="125" stroke="#4a7c59" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="222" cy="125" r="7" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2"/>
+  <!-- arms reaching -->
+  <line x1="80" y1="100" x2="200" y2="127" stroke="#4a7c59" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6,3"/>
+  <defs><marker id="ar-ham" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
+  <path d="M160,155 Q170,145 175,133" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-ham)"/>
+  <text x="155" y="165" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">Posterior chain stretch</text>
+</svg>`,
+      steps: [
+        'Sit on the floor with both legs straight in front of you (long sit position).',
+        'Sit tall, then hinge forward from the hips — not by rounding the spine.',
+        'Reach forward toward your feet. Use a strap around your feet if needed.',
+        'Hold 45 seconds. Right side: ease in gently — conservative for proximal hamstring tendinopathy.',
+        'Focus on feeling the stretch in the belly of the hamstring, not behind the knee.',
+      ],
+      feel: 'A stretch in the middle of the back of the thigh. Not sharp behind the knee. Not specifically in the sitting bones (stop if so — proximal hamstring tendinopathy warning).',
+      prog: {
+        ready: 'Both hands reach past the heels with straight legs and a neutral spine, held for 60 seconds.',
+        next: 'Progress to single-leg version, holding the raised leg at different angles to vary the neural component.',
+        goal: 'Full posterior chain length — hamstrings long enough for comfortable high foot placements and heel hooks.',
+        time: '8–12 weeks for meaningful hamstring length gains, particularly on the right side.'
+      }
+    },
+
+    'mob-leg5': {
+      svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="185" x2="280" y2="185" stroke="#ccc" stroke-width="1.5"/>
+  <!-- frog / wide squat position -->
+  <circle cx="150" cy="55" r="14" fill="#e8f2ec" stroke="#4a7c59" stroke-width="2.5"/>
+  <line x1="150" y1="69" x2="150" y2="105" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- left leg wide -->
+  <line x1="150" y1="105" x2="95" y2="145" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="95" y1="145" x2="88" y2="183" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- right leg wide -->
+  <line x1="150" y1="105" x2="205" y2="145" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <line x1="205" y1="145" x2="212" y2="183" stroke="#4a7c59" stroke-width="3" stroke-linecap="round"/>
+  <!-- arms support -->
+  <line x1="150" y1="88" x2="120" y2="115" stroke="#4a7c59" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="150" y1="88" x2="180" y2="115" stroke="#4a7c59" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="220" y="110" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">Deep</text>
+  <text x="220" y="123" fill="#4a7c59" font-size="11" font-family="Inter,sans-serif">frog</text>
+  <defs><marker id="ar-frog" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
+  <path d="M115,163 Q105,150 97,143" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-frog)"/>
+  <path d="M185,163 Q195,150 203,143" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#ar-frog)"/>
+</svg>`,
+      steps: [
+        'Start on all fours. Walk both knees out to the sides as wide as comfortable.',
+        'Lower your forearms to the floor for support. Hips should be in line with or lower than the knees.',
+        'Toes can point out or straight back — experiment to find where you feel it most.',
+        'Hold for 45 seconds, breathing into the groin stretch. Rock gently forward and back.',
+        'Exit by walking the knees back in before attempting to stand.',
+      ],
+      feel: 'A wide, deep stretch in the inner thighs and groin on both sides simultaneously. Some stretch into the hip flexors. No knee pain.',
+      prog: {
+        ready: 'You can comfortably hold 60 seconds with forearms on the floor and hips dropping below knee level.',
+        next: 'Gradually increase the width of the knees over weeks. Progress toward a full frog position with hips on the floor.',
+        goal: 'Wide hip opening range — enough for comfortable stemming, hip turns, and high foot placements in climbing.',
+        time: '10–14 weeks for meaningful hip width and groin flexibility improvement.'
+      }
+    },
+
   }; /* end MOB_DETAILS */
 
   function toggleMobDetail(id) {
@@ -1178,18 +1333,23 @@
     const physio     = !!loadSettings().physioCleared;
     const dayInfo    = MOB_DAY_INFO[dow];
 
-    document.getElementById('mob-day-name').textContent     = dayInfo.name;
-    document.getElementById('mob-day-type').textContent     = `${dayInfo.type} · ${dayInfo.duration}`;
+    document.getElementById('mob-day-name').textContent      = dayInfo.name;
+    document.getElementById('mob-day-type').textContent      = `${dayInfo.type} · ~30 min`;
     document.getElementById('mob-day-rationale').textContent = dayInfo.rationale;
 
     checkMobWarningBanner();
 
+    // 4 essentials always shown
     document.getElementById('mob-daily-list').innerHTML =
-      MOB_DAILY_STAPLES.map(ex => buildMobExRowNew(ex, dateStr)).join('');
+      MOB_ESSENTIALS.map(ex => buildMobExRowNew(ex, dateStr)).join('');
 
-    const deeperExs  = MOB_DEEPER_WORK[dow]   || [];
-    const lockedExs  = MOB_LOCKED_DEEPER[dow] || [];
-    let deeperHtml   = deeperExs.map(ex => buildMobExRowNew(ex, dateStr)).join('');
+    // 6 from pool, seeded by date for variety
+    const seed      = _dateSeed(dateStr);
+    const shuffled  = _seededShuffle(MOB_POOL, seed);
+    const poolPicks = shuffled.slice(0, 6);
+
+    const lockedExs = MOB_LOCKED_DEEPER[dow] || [];
+    let deeperHtml  = poolPicks.map(ex => buildMobExRowNew(ex, dateStr)).join('');
     if (lockedExs.length) {
       deeperHtml += physio
         ? lockedExs.map(ex => buildMobExRowNew(ex, dateStr)).join('')

@@ -3,49 +3,54 @@
     22.5,25,27.5,30,32.5,35,37.5,40,42.5,45,47.5,50,52.5,55,57.5,60,65,70,75,80,85,90,95,100,110,120,130,140,150];
 
   const GYM_EXERCISES = {
+    // Pull-up bar → cable station (5 exercises) → DB/floor
     'Upper A': [
       { id:'ua-pullup',   name:'Pull-up neutral grip',           sets:4, repRange:[3,4],   weight:'BW', type:'bw',       cue:'Full dead hang, no kip, 2-sec descent', caution:'Left middle finger A2 pulley — stop on any finger pain' },
-      { id:'ua-ext-rot',  name:'Cable external rotation',        sets:3, repRange:[12,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Elbow pinned to ribs, slow, no momentum' },
       { id:'ua-latpd',    name:'Lat pulldown',                   sets:3, repRange:[8,10],  weight:60,   inc:2.5,  type:'weighted', cue:'Tuck elbows to ribs, no torso swing' },
-      { id:'ua-wrist',    name:'Reverse wrist curl',             sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Full range, burn in muscle belly not elbow' },
       { id:'ua-srow',     name:'Seated cable row',               sets:3, repRange:[10,12], weight:60,   inc:2.5,  type:'weighted', cue:'Proud chest, retract scapulae, no shrug' },
       { id:'ua-facepull', name:'Face pull',                      sets:3, repRange:[15,15], weight:17.5, inc:2.5,  type:'weighted', cue:'Pull to forehead, thumbs back' },
-      { id:'ua-deadbug',  name:'Dead bug',                       sets:3, repRange:[8,8],   weight:'BW', type:'bw',       cue:'Low back glued to floor' },
+      { id:'ua-ext-rot',  name:'Cable external rotation',        sets:3, repRange:[12,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Elbow pinned to ribs, slow, no momentum' },
       { id:'ua-pallof',   name:'Pallof press',                   sets:2, repRange:[10,10], weight:10,   inc:2.5,  type:'weighted', cue:'Resist rotation, ribs down' },
+      { id:'ua-wrist',    name:'Reverse wrist curl',             sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Full range, burn in muscle belly not elbow' },
+      { id:'ua-deadbug',  name:'Dead bug',                       sets:3, repRange:[8,8],   weight:'BW', type:'bw',       cue:'Low back glued to floor' },
     ],
+    // Cardio machine → leg machines → floor
     'Engine + Lower': [
       { id:'el-zone2',   name:'Zone 2 cardio', type:'zone2' },
       { id:'el-hipab',   name:'Seated hip abductor',             sets:3, repRange:[15,15], weight:30,   inc:5,    type:'weighted', cue:'Glute medius, no foot loading' },
-      { id:'el-bandab',  name:'Side-lying band hip abduction',   sets:2, repRange:[15,15], weight:'BW', type:'bw',       cue:'Slow, no hip rock' },
       { id:'el-hamcurl', name:'Lying hamstring curl',            sets:3, repRange:[10,12], weight:20,   inc:2.5,  type:'weighted', cue:'Moderate load only', caution:'Proximal hamstring tendinopathy right — keep moderate and pain-free' },
       { id:'el-calf',    name:'Left single-leg calf raise',      sets:3, repRange:[12,12], weight:'BW', type:'bw',       cue:'Left leg only, full range, pause at top' },
+      { id:'el-bandab',  name:'Side-lying band hip abduction',   sets:2, repRange:[15,15], weight:'BW', type:'bw',       cue:'Slow, no hip rock' },
       { id:'el-plank',   name:'Forearm plank',                   sets:3, type:'timed',     weight:'BW', targetSec:30, inc:5, cue:'Hips level, no sag' },
     ],
+    // Bar → dip station → DB → cable station → floor
     'Upper B': [
+      { id:'ub-scappu',  name:'Scapular pull-up',                sets:3, repRange:[8,10],  weight:'BW', type:'bw',       cue:'Feel lats switch on, no shrug' },
+      { id:'ub-adip',    name:'Assisted dip',                    sets:3, repRange:[6,8],   weight:'BW', type:'assisted', cue:'Slight forward lean, control down', caution:'Stop above pain-free depth' },
       { id:'ub-dbrow',   name:'Single-arm DB row',               sets:4, repRange:[8,10],  weight:26,   inc:2,    type:'weighted', cue:'Brace hard, no rotation' },
+      { id:'ub-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Own the range' },
       { id:'ub-ext-rot', name:'Cable external rotation',         sets:3, repRange:[12,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Quality over load' },
       { id:'ub-csrow',   name:'Chest-supported row',             sets:3, repRange:[10,12], weight:50,   inc:2.5,  type:'weighted', cue:'Squeeze scapulae, control the negative' },
-      { id:'ub-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Own the range' },
-      { id:'ub-adip',    name:'Assisted dip',                    sets:3, repRange:[6,8],   weight:'BW', type:'assisted', cue:'Slight forward lean, control down', caution:'Stop above pain-free depth' },
-      { id:'ub-scappu',  name:'Scapular pull-up',                sets:3, repRange:[8,10],  weight:'BW', type:'bw',       cue:'Feel lats switch on, no shrug' },
       { id:'ub-bdog',    name:'Bird dog',                        sets:3, repRange:[8,8],   weight:'BW', type:'bw',       cue:'Slow, no hip tilt' },
     ],
+    // Cardio → cable station → DB/floor → GHD
     'Engine + Prehab': [
       { id:'ep-zone2',   name:'Zone 2 cardio', type:'zone2' },
       { id:'ep-ext-rot', name:'Cable external rotation',         sets:3, repRange:[15,15], weight:6.25, inc:1.25, type:'weighted', staple:true, cue:'Extra ER volume — most urgent finding' },
+      { id:'ep-pallof',  name:'Pallof press',                    sets:3, repRange:[10,10], weight:10,   inc:2.5,  type:'weighted', cue:'Anti-rotation, ribs down' },
       { id:'ep-slyder',  name:'Side-lying DB external rotation', sets:2, repRange:[12,12], weight:2.5,  inc:1.25, type:'weighted', cue:'Tiny weight, perfect form, elbow tucked' },
       { id:'ep-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[15,15], weight:5,    inc:1.25, type:'weighted', staple:true, cue:'Extra wrist extensor volume' },
-      { id:'ep-pallof',  name:'Pallof press',                    sets:3, repRange:[10,10], weight:10,   inc:2.5,  type:'weighted', cue:'Anti-rotation, ribs down' },
       { id:'ep-ghd',     name:'GHD back extension',              sets:2, repRange:[12,12], weight:'BW', type:'bw',       cue:'Finish at straight line only — do NOT hyperextend', caution:'Controlled range, foot anchored' },
     ],
+    // Bar (chin-up + HLR same bar) → cable station → DB
     'Upper C': [
       { id:'uc-chinup',  name:'Pull-up supinated chin-up',       sets:4, repRange:[3,4],   weight:'BW',  type:'bw',       cue:'Control the negative' },
-      { id:'uc-ext-rot', name:'Cable external rotation',         sets:3, repRange:[12,15], weight:6.25,  inc:1.25, type:'weighted', staple:true, cue:'Never skip' },
-      { id:'uc-latpd',   name:'Lat pulldown',                   sets:3, repRange:[8,10],  weight:60,    inc:2.5,  type:'weighted', cue:'Elbow tuck, no swing' },
-      { id:'uc-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,     inc:1.25, type:'weighted', staple:true, cue:'' },
-      { id:'uc-dbpress', name:'Neutral DB shoulder press',       sets:3, repRange:[8,10],  weight:13,    inc:2,    type:'weighted', cue:'Ribs down, no low-back arch', caution:'No heavy OHP pre-physio, shoulder flags present' },
-      { id:'uc-srow',    name:'Seated cable row',                sets:3, repRange:[10,12], weight:60,    inc:2.5,  type:'weighted', cue:'Extra pull volume' },
       { id:'uc-hlr',     name:'Hanging leg raise',               sets:3, repRange:[8,10],  weight:'BW',  type:'bw',       cue:'Switch to lying if grip fails first' },
+      { id:'uc-latpd',   name:'Lat pulldown',                   sets:3, repRange:[8,10],  weight:60,    inc:2.5,  type:'weighted', cue:'Elbow tuck, no swing' },
+      { id:'uc-srow',    name:'Seated cable row',                sets:3, repRange:[10,12], weight:60,    inc:2.5,  type:'weighted', cue:'Extra pull volume' },
+      { id:'uc-ext-rot', name:'Cable external rotation',         sets:3, repRange:[12,15], weight:6.25,  inc:1.25, type:'weighted', staple:true, cue:'Never skip' },
+      { id:'uc-dbpress', name:'Neutral DB shoulder press',       sets:3, repRange:[8,10],  weight:13,    inc:2,    type:'weighted', cue:'Ribs down, no low-back arch', caution:'No heavy OHP pre-physio, shoulder flags present' },
+      { id:'uc-wrist',   name:'Reverse wrist curl',              sets:3, repRange:[12,15], weight:5,     inc:1.25, type:'weighted', staple:true, cue:'' },
     ],
   };
 
@@ -516,29 +521,10 @@
     return `Last session ${dateStr}: ${parts.join(', ')}`;
   }
 
-  function wOpts(def) {
-    const base = [...WEIGHT_OPTS_BASE];
-    const defN = (def !== 'BW') ? Number(def) : 'BW';
-    if (defN !== 'BW' && !base.includes(defN)) {
-      const idx = base.findIndex(v => typeof v === 'number' && v > defN);
-      idx > -1 ? base.splice(idx, 0, defN) : base.push(defN);
-    }
-    return base.map(v => {
-      const sel = String(v) === String(def) ? ' selected' : '';
-      const lbl = v === 'BW' ? 'BW' : `${v} kg`;
-      return `<option value="${v}"${sel}>${lbl}</option>`;
-    }).join('');
-  }
-
-  function rOpts(def) {
-    let h = '';
-    for (let i = 1; i <= 30; i++) h += `<option value="${i}"${i === def ? ' selected' : ''}>${i}</option>`;
-    return h;
-  }
-
   function rirOpts(def) {
-    def = def == null ? '2' : String(def);
-    return ['0','1','2','3','4+'].map(v => `<option value="${v}"${v === def ? ' selected' : ''}>${v}</option>`).join('');
+    def = def == null ? '3' : String(def);
+    const LABELS = { '1':'1 — easy', '2':'2 — moderate', '3':'3 — hard', '4':'4 — very hard', '5':'5 — max' };
+    return ['1','2','3','4','5'].map(v => `<option value="${v}"${v === def ? ' selected' : ''}>${LABELS[v]}</option>`).join('');
   }
 
   function buildSetRows(ex, lastData) {
@@ -548,14 +534,15 @@
         <span class="set-col-spacer"></span>
         <div class="set-col-hdr"><span class="set-col-hdr-main">Weight</span><span class="set-col-hdr-sub">load progression</span></div>
         <div class="set-col-hdr"><span class="set-col-hdr-main">Reps</span><span class="set-col-hdr-sub">volume target</span></div>
-        <div class="set-col-hdr"><span class="set-col-hdr-main">RIR</span><span class="set-col-hdr-sub">effort gate</span></div>
+        <div class="set-col-hdr"><span class="set-col-hdr-main">Effort</span><span class="set-col-hdr-sub">1 easy → 5 max</span></div>
+        <span class="set-col-remove-spacer"></span>
       </div>`;
     }
     for (let i = 0; i < ex.sets; i++) {
       const last  = lastData?.sets?.[i];
       const defW  = last?.weight  ?? ex.weight;
       const defR  = last?.reps    ?? (ex.repRange ? ex.repRange[0] : 1);
-      const defRIR = last?.rir    ?? '2';
+      const defRIR = last?.rir    ?? '3';
       const defSec = last?.secs   ?? getTimedTarget(ex.id, ex.targetSec || 30);
 
       if (ex.type === 'timed') {
@@ -563,13 +550,21 @@
           <span class="set-lbl">Set ${i+1}</span>
           <input type="number" class="sel-secs" min="5" max="600" step="5" value="${defSec}" />
           <span style="font-size:12px;color:var(--text-sec);white-space:nowrap;flex-shrink:0">sec</span>
+          <button type="button" class="btn-remove-set" onclick="this.closest('.set-row').remove()" title="Remove set">×</button>
         </div>`;
       } else {
+        const isBW  = ex.weight === 'BW' || ex.type === 'assisted';
+        const wVal  = isBW ? (defW === 'BW' ? 0 : defW) : defW;
+        const wUnit = isBW ? 'kg added' : 'kg';
         html += `<div class="set-row">
           <span class="set-lbl">Set ${i+1}</span>
-          <select class="sel-weight">${wOpts(defW)}</select>
-          <select class="sel-reps">${rOpts(defR)}</select>
+          <div class="input-unit-wrap">
+            <input type="number" class="sel-weight" step="1.25" min="0" max="300" value="${wVal}" />
+            <span class="input-unit">${wUnit}</span>
+          </div>
+          <input type="number" class="sel-reps" step="1" min="1" max="50" value="${defR}" />
           <select class="sel-rir">${rirOpts(defRIR)}</select>
+          <button type="button" class="btn-remove-set" onclick="this.closest('.set-row').remove()" title="Remove set">×</button>
         </div>`;
       }
     }
@@ -598,16 +593,107 @@
       <div class="ex-header">
         <span class="ex-name">${ex.name}</span>
         ${staple}${cautionIcon}
+        <button type="button" class="btn-skip-ex" onclick="(function(btn){const card=btn.closest('.ex-card');const skipped=card.dataset.skipped==='true';card.dataset.skipped=skipped?'false':'true';btn.textContent=skipped?'Skip':'Skipped';btn.classList.toggle('active',!skipped);card.querySelector('.ex-sets-body').style.opacity=skipped?'1':'0.35';card.querySelector('.ex-sets-body').style.pointerEvents=skipped?'':'none';})(this)">Skip</button>
       </div>
       ${cautionText}
       ${cueHtml}
       ${btnRow}
       ${whyBody}
       ${howBody}
-      <div class="ex-last">${lastStr}</div>
-      <div class="set-rows">${buildSetRows(ex, lastData)}</div>
-      <textarea class="ex-notes" placeholder="Notes…"></textarea>
+      <div class="ex-sets-body">
+        <div class="ex-last">${lastStr}</div>
+        <div class="set-rows">${buildSetRows(ex, lastData)}</div>
+        <textarea class="ex-notes" placeholder="Notes…"></textarea>
+      </div>
     </div>`;
+  }
+
+  /* ─── SESSION DURATION ESTIMATE ────────────────────────────────── */
+  function calcEstDuration(exercises, dayType) {
+    let totalSec = 0;
+    const isEngine = ['Engine + Lower','Engine + Prehab'].includes(dayType);
+    if (isEngine) totalSec += 35 * 60; // zone 2 default 35 min
+
+    exercises.forEach(ex => {
+      if (ex.type === 'zone2') return;
+      const sets = ex.sets || 0;
+      if (ex.type === 'timed') {
+        const target = getTimedTarget(ex.id, ex.targetSec || 30);
+        totalSec += sets * (target + 60); // set + 60s rest
+      } else if (ex.repRange && ex.repRange[0] >= 12) {
+        totalSec += sets * (30 + 60) + 30; // isolation: 30s set, 60s rest, 30s transition
+      } else {
+        totalSec += sets * (35 + 90) + 30; // strength: 35s set, 90s rest, 30s transition
+      }
+    });
+    return Math.round(totalSec / 60);
+  }
+
+  /* ─── DRAFT PERSISTENCE ────────────────────────────────────────── */
+  const KEY_GYM_DRAFT = 'tt_gym_draft';
+  let _draftTimer = null;
+
+  function saveGymDraft() {
+    const todayStr = toDateStr(new Date());
+    const draft = { date: todayStr, inputs: {} };
+    document.querySelectorAll('#gym-exercise-list .ex-card').forEach(card => {
+      const exId = card.dataset.exId;
+      if (!exId) return;
+      const sets = [];
+      card.querySelectorAll('.set-row').forEach(row => {
+        const w = row.querySelector('.sel-weight');
+        const r = row.querySelector('.sel-reps');
+        const rir = row.querySelector('.sel-rir');
+        const s = row.querySelector('.sel-secs');
+        if (s) sets.push({ secs: s.value });
+        else if (w) sets.push({ weight: w.value, reps: r?.value, rir: rir?.value });
+      });
+      draft.inputs[exId] = {
+        sets,
+        notes: card.querySelector('.ex-notes')?.value || '',
+        skipped: card.dataset.skipped === 'true',
+      };
+    });
+    localStorage.setItem(KEY_GYM_DRAFT, JSON.stringify(draft));
+  }
+
+  function restoreGymDraft(todayStr) {
+    let draft;
+    try { draft = JSON.parse(localStorage.getItem(KEY_GYM_DRAFT) || 'null'); } catch { return; }
+    if (!draft || draft.date !== todayStr) return;
+
+    document.querySelectorAll('#gym-exercise-list .ex-card').forEach(card => {
+      const exId = card.dataset.exId;
+      const saved = draft.inputs[exId];
+      if (!saved) return;
+
+      const setRows = [...card.querySelectorAll('.set-row')];
+      saved.sets.forEach((s, i) => {
+        const row = setRows[i];
+        if (!row) return;
+        if (s.secs !== undefined) {
+          const inp = row.querySelector('.sel-secs');
+          if (inp) inp.value = s.secs;
+        } else {
+          const w = row.querySelector('.sel-weight');
+          const r = row.querySelector('.sel-reps');
+          const rir = row.querySelector('.sel-rir');
+          if (w) w.value = s.weight;
+          if (r) r.value = s.reps;
+          if (rir) rir.value = s.rir;
+        }
+      });
+      const notes = card.querySelector('.ex-notes');
+      if (notes) notes.value = saved.notes || '';
+
+      if (saved.skipped) {
+        card.dataset.skipped = 'true';
+        const btn = card.querySelector('.btn-skip-ex');
+        const body = card.querySelector('.ex-sets-body');
+        if (btn) { btn.textContent = 'Skipped'; btn.classList.add('active'); }
+        if (body) { body.style.opacity = '0.35'; body.style.pointerEvents = 'none'; }
+      }
+    });
   }
 
   /* ─── GYM LOGGER RENDER ─────────────────────────────────────────── */
@@ -626,6 +712,31 @@
 
     const exercises = GYM_EXERCISES[dayType] || [];
     document.getElementById('gym-exercise-list').innerHTML = exercises.map(renderExCard).join('');
+
+    // Duration estimate banner
+    const banner = document.getElementById('gym-duration-banner');
+    if (banner && exercises.length) {
+      const estMin = calcEstDuration(exercises, dayType);
+      const startKey = 'tt_gym_start_' + todayStr;
+      const startTime = parseInt(localStorage.getItem(startKey) || '0');
+      if (!startTime) localStorage.setItem(startKey, String(Date.now()));
+      const elapsed = startTime ? Math.floor((Date.now() - startTime) / 60000) : 0;
+      const elapsedStr = elapsed >= 5 ? ` · ${elapsed} min in` : '';
+      banner.style.display = 'block';
+      banner.innerHTML = `<i class="fa-regular fa-clock"></i> Est. ~<strong>${estMin} min</strong>${elapsedStr}`;
+    }
+
+    restoreGymDraft(todayStr);
+
+    const list = document.getElementById('gym-exercise-list');
+    list.addEventListener('input', () => {
+      clearTimeout(_draftTimer);
+      _draftTimer = setTimeout(saveGymDraft, 500);
+    });
+    list.addEventListener('change', () => {
+      clearTimeout(_draftTimer);
+      _draftTimer = setTimeout(saveGymDraft, 500);
+    });
   }
 
   /* ─── PROGRESSIVE OVERLOAD ──────────────────────────────────────── */
@@ -649,7 +760,7 @@
 
     if (ex.type === 'weighted' || ex.type === 'assisted') {
       const top    = ex.repRange[1];
-      const allHit = sets.every(s => s.reps >= top && ['0','1','2'].includes(String(s.rir)));
+      const allHit = sets.every(s => s.reps >= top && parseInt(s.rir) >= 4);
       if (allHit) {
         out.ready = true;
         const w = parseFloat(sets[0].weight);
@@ -710,6 +821,11 @@
       const card = document.querySelector(`[data-ex-id="${ex.id}"]`);
       if (!card) return;
 
+      if (card.dataset.skipped === 'true') {
+        exerciseData.push({ id:ex.id, name:ex.name, sets:[], notes:'', skipped:true, progressionFlag:false, stallFlag:false });
+        return;
+      }
+
       let sets = [];
       if (ex.type === 'timed') {
         card.querySelectorAll('.sel-secs').forEach((inp, i) => {
@@ -721,7 +837,10 @@
           const rEl  = row.querySelector('.sel-reps');
           const rirEl= row.querySelector('.sel-rir');
           if (!wEl) return;
-          sets.push({ setNum:i+1, weight:wEl.value, reps:parseInt(rEl.value)||0, rir:rirEl.value });
+          const rawW = parseFloat(wEl.value);
+          const isBWEx = ex.weight === 'BW' || ex.type === 'assisted';
+          const weight = (isBWEx && rawW === 0) ? 'BW' : (isNaN(rawW) ? wEl.value : rawW);
+          sets.push({ setNum:i+1, weight, reps:parseInt(rEl.value)||0, rir:rirEl.value });
         });
       }
 
@@ -737,6 +856,7 @@
     const sessions = loadSessions(KEY_GYM);
     sessions.push(session);
     localStorage.setItem(KEY_GYM, JSON.stringify(sessions));
+    localStorage.removeItem(KEY_GYM_DRAFT);
 
     const stalls = exerciseData.filter(e => e.stallFlag);
     let msg = 'Session saved!';

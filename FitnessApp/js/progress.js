@@ -202,6 +202,9 @@
       });
       sel.addEventListener('change', renderOverloadForExercise);
       _olSelectSeeded = true;
+      // Default to first exercise that actually has session data
+      const firstWithData = getAllExercises().find(ex => getExSessions(ex.id).length > 0);
+      if (firstWithData) sel.value = firstWithData.id;
     }
     renderOverloadForExercise();
     renderStallAlerts();
