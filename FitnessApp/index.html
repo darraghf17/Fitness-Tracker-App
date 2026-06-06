@@ -10,8 +10,7 @@
   <!-- Force fresh load on every home-screen open to beat iOS web-clip cache -->
   <script>
     (function () {
-      if (!sessionStorage.getItem('loaded')) {
-        sessionStorage.setItem('loaded', '1');
+      if (!location.search.includes('t=')) {
         location.replace(location.pathname + '?t=' + Date.now());
       }
     })();
