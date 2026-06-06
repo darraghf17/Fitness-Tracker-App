@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Training Tracker</title>
+  <!-- Force fresh load on every home-screen open to beat iOS web-clip cache -->
+  <script>
+    (function () {
+      if (!sessionStorage.getItem('loaded')) {
+        sessionStorage.setItem('loaded', '1');
+        location.replace(location.pathname + '?t=' + Date.now());
+      }
+    })();
+  </script>
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
