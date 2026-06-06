@@ -189,4 +189,5 @@
     });
 
     renderDashboard();
+    renderMobilityLogger();
   });
