@@ -763,6 +763,10 @@
     .slider-val.green { background:#f0faf3; color:var(--success); }
     .slider-ticks { display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec); margin-top:3px; }
 
+    .rest-day-card { background:var(--bg-card); border:2px solid var(--border); text-align:center; padding:24px 16px; }
+    .rest-day-title { font-size:17px; font-weight:700; color:var(--text-main); margin-bottom:6px; }
+    .rest-day-sub   { font-size:14px; color:var(--text-sec); }
+
     .zone2-card { background:#eff6ff; border:2px solid #3b82f6; }
     .zone2-ttl  { font-size:14px; font-weight:700; color:#1d4ed8; margin-bottom:4px; }
     .zone2-sub  { font-size:12px; color:#3b82f6; margin-bottom:12px; }

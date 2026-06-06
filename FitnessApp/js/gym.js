@@ -711,7 +711,22 @@
     document.getElementById('gym-zone2-card').style.display = isEngine ? 'block' : 'none';
 
     const exercises = GYM_EXERCISES[dayType] || [];
-    document.getElementById('gym-exercise-list').innerHTML = exercises.map(renderExCard).join('');
+    const completeBtn = document.getElementById('btn-complete-session');
+
+    if (!exercises.length) {
+      document.getElementById('gym-exercise-list').innerHTML = `
+        <div class="card rest-day-card">
+          <div class="rest-day-title">Rest Day</div>
+          <div class="rest-day-sub">No gym session today — head to your mobility session instead.</div>
+          <button class="btn btn-primary" style="margin-top:12px" onclick="navigateTo('screen-mobility')">
+            <i class="fa-solid fa-person-running"></i> Go to Mobility
+          </button>
+        </div>`;
+      if (completeBtn) completeBtn.closest('.complete-wrap').style.display = 'none';
+    } else {
+      document.getElementById('gym-exercise-list').innerHTML = exercises.map(renderExCard).join('');
+      if (completeBtn) completeBtn.closest('.complete-wrap').style.display = '';
+    }
 
     // Duration estimate banner
     const banner = document.getElementById('gym-duration-banner');
