@@ -23,6 +23,7 @@
   const KEY_SETTINGS = 'tt_settings';
   const KEY_GYM      = 'tt_gym_sessions';
   const KEY_MOB      = 'tt_mob_sessions';
+  const KEY_REHAB    = 'tt_rehab_sessions';
 
   /* ─── SETTINGS ──────────────────────────────────────────────────── */
   const SETTING_DEFAULTS = {

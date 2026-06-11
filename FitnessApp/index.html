@@ -52,6 +52,10 @@
         <i class="fa-solid fa-person-running"></i>
         <span>Log Mobility</span>
       </button>
+      <button class="cta-card cta-rehab" onclick="navigateTo('screen-rehab')">
+        <i class="fa-solid fa-person-walking"></i>
+        <span>Daily Rehab</span>
+      </button>
     </div>
 
     <!-- Streaks -->
@@ -394,7 +398,27 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════
-       SCREEN 8 — CALENDAR
+       SCREEN 8 — DAILY REHAB
+  ══════════════════════════════════════════════════════════════ -->
+  <section id="screen-rehab" class="screen">
+    <div class="screen-header">
+      <h1>Daily Rehab</h1>
+      <p>Every day · ~10 min · ankle rehabilitation</p>
+    </div>
+
+    <div class="rehab-progress-wrap">
+      <div id="rehab-progress-text" class="rehab-progress-text">0 of 3 completed</div>
+      <div class="mob-progress-bar-track">
+        <div id="rehab-progress-fill" class="mob-progress-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="mob-section-label">Prescribed Exercises</div>
+    <div class="card" id="rehab-exercise-list"></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 9 — CALENDAR
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-calendar" class="screen">
     <div class="screen-header">
@@ -456,6 +480,7 @@
 <script src="js/utils.js?v=3"></script>
 <script src="js/gym.js?v=3"></script>
 <script src="js/mobility.js?v=3"></script>
+<script src="js/rehab.js?v=1"></script>
 <script src="js/progress.js?v=3"></script>
 <script src="js/calendar.js?v=3"></script>
 <script src="js/main.js?v=3"></script>

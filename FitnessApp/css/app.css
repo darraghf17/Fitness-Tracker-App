@@ -953,3 +953,44 @@
     .how-steps li::before { content:"→ "; color:#4a7c59; font-weight:700; }
     .how-text { font-size:15px; color:#1a1a1a; line-height:1.6; margin:0; }
     .how-sub  { font-weight:700; font-size:13px; color:#4a7c59; margin:10px 0 4px; display:block; }
+
+    /* ─── DAILY REHAB ────────────────────────────────────────────────── */
+    .cta-rehab { background: #0d9488; color: #fff; }
+
+    .rehab-progress-wrap {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .rehab-progress-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    #rehab-progress-fill { background: #0d9488; }
+
+    .rehab-equip-badge {
+      font-size: 11px; font-weight: 700;
+      background: #ccfbf1; color: #0f766e;
+      border-radius: 6px; padding: 2px 8px;
+      display: inline-block; margin-top: 4px;
+    }
+    .rehab-sides-badge {
+      font-size: 11px; font-weight: 600;
+      background: #f0fdf4; color: #166534;
+      border-radius: 6px; padding: 2px 8px;
+      display: inline-block; margin-top: 4px;
+    }
+    .rehab-ex-meta { font-size: 12px; color: var(--text-sec); margin-top: 3px; }
+    .rehab-ex-done { border-left: 4px solid #0d9488; padding-left: 6px; }
+
+    .rehab-how-wrap {
+      margin-top: 10px;
+      background: #f0fdfa;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .rehab-how-text { font-size: 14px; color: var(--text); line-height: 1.65; margin: 0; }

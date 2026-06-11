@@ -51,6 +51,21 @@
       }
     }
 
+    const rehabSessions  = loadSessions(KEY_REHAB);
+    const rehabDoneToday = rehabSessions.some(s => s.date === todayStr);
+    const ctaRehab = document.querySelector('.cta-rehab');
+    if (ctaRehab) {
+      if (rehabDoneToday) {
+        ctaRehab.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Rehab Done</span>';
+        ctaRehab.classList.add('cta-done');
+        ctaRehab.onclick = null;
+      } else {
+        ctaRehab.innerHTML = '<i class="fa-solid fa-person-walking"></i><span>Daily Rehab</span>';
+        ctaRehab.classList.remove('cta-done');
+        ctaRehab.onclick = () => navigateTo('screen-rehab');
+      }
+    }
+
     const lastGym = gymSessions.length ? gymSessions[gymSessions.length - 1] : null;
     const lastMob = mobSessions.length ? mobSessions[mobSessions.length - 1] : null;
 
@@ -190,4 +205,5 @@
 
     renderDashboard();
     renderMobilityLogger();
+    renderRehabLogger();
   });

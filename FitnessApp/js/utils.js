@@ -67,6 +67,7 @@
     if (scr) scr.classList.add('active');
     if (screenId === 'screen-gym')      renderGymLogger();
     if (screenId === 'screen-mobility') renderMobilityLogger();
+    if (screenId === 'screen-rehab')    renderRehabLogger();
     if (screenId === 'screen-progress') renderProgress();
     if (screenId === 'screen-overload') renderOverload();
     if (screenId === 'screen-calendar') renderCalendar();
