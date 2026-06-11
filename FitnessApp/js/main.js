@@ -100,16 +100,7 @@
   function renderSettings() {
     const s = loadSettings();
     document.getElementById('sett-name').value        = s.athleteName;
-    document.getElementById('sett-block-start').value = s.blockStartDate || '';
-    document.getElementById('sett-physio').checked    = !!s.physioCleared;
     document.getElementById('sett-report-date').value = s.lastReportDate || '';
-    const blockVal = s.block || getAutoBlock(toDateStr(new Date()));
-    document.querySelectorAll('input[name="sett-block"]').forEach(r => { r.checked = r.value === blockVal; });
-    updateRationale(blockVal);
-  }
-
-  function updateRationale(blockName) {
-    document.getElementById('rationale-text').textContent = PROGRAMME_RATIONALE[blockName] || '';
   }
 
   /* ─── SETTINGS LISTENERS ────────────────────────────────────────── */
@@ -117,23 +108,6 @@
     document.getElementById('sett-name').addEventListener('input', e => {
       saveSettings({ athleteName: e.target.value });
       renderDashboard();
-    });
-
-    document.querySelectorAll('input[name="sett-block"]').forEach(r => {
-      r.addEventListener('change', e => {
-        saveSettings({ block: e.target.value });
-        updateRationale(e.target.value);
-        renderDashboard();
-        if (document.getElementById('screen-calendar')?.classList.contains('active')) renderCalendar();
-      });
-    });
-
-    document.getElementById('sett-block-start').addEventListener('change', e => {
-      saveSettings({ blockStartDate: e.target.value });
-    });
-
-    document.getElementById('sett-physio').addEventListener('change', e => {
-      saveSettings({ physioCleared: e.target.checked });
     });
 
     document.getElementById('sett-report-date').addEventListener('change', e => {
@@ -175,13 +149,6 @@
       e.target.value = '';
     });
 
-    const toggle  = document.getElementById('rationale-toggle');
-    const body    = document.getElementById('rationale-body');
-    toggle.addEventListener('click', () => {
-      const open = body.style.display === 'block';
-      body.style.display = open ? 'none' : 'block';
-      toggle.classList.toggle('open', !open);
-    });
   }
 
   /* ─── INIT ──────────────────────────────────────────────────────── */

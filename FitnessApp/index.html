@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="css/app.css?v=4" />
 </head>
 
 <body>
@@ -330,38 +330,6 @@
       </div>
     </div>
 
-    <!-- Programme -->
-    <div class="card">
-      <div class="card-title">Programme</div>
-      <div class="form-group">
-        <label>Current block</label>
-        <div class="block-pills">
-          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 1"><span class="block-pill">Block 1</span></label>
-          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 2A"><span class="block-pill">Block 2A</span></label>
-          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 2B"><span class="block-pill">Block 2B</span></label>
-          <label class="block-pill-label"><input type="radio" name="sett-block" value="Block 3"><span class="block-pill">Block 3</span></label>
-        </div>
-      </div>
-      <div class="form-group" style="margin-bottom:0">
-        <label for="sett-block-start">Block start date</label>
-        <input type="date" id="sett-block-start" />
-      </div>
-    </div>
-
-    <!-- Physio Clearance -->
-    <div class="card">
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-title">Physio cleared</div>
-          <div class="toggle-sub">Unlock post-9-June exercises</div>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="sett-physio" />
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-    </div>
-
     <!-- Coach Report -->
     <div class="card">
       <div class="card-title">Coach Report</div>
@@ -381,18 +349,6 @@
         <i class="fa-solid fa-upload"></i>&nbsp; Import data from JSON
         <input type="file" id="sett-import" accept=".json" style="display:none" />
       </label>
-    </div>
-
-    <!-- Programme Rationale -->
-    <div class="card">
-      <button class="rationale-toggle" id="rationale-toggle">
-        <span>Programme rationale</span>
-        <i class="fa-solid fa-chevron-down" id="rationale-chevron"></i>
-      </button>
-      <div id="rationale-body" style="display:none">
-        <div class="divider"></div>
-        <p id="rationale-text" style="font-size:14px;color:var(--text-sec);line-height:1.7"></p>
-      </div>
     </div>
 
   </section>
@@ -476,13 +432,13 @@
 
 </div><!-- /#app -->
 
-<script src="js/data.js?v=3"></script>
-<script src="js/utils.js?v=3"></script>
-<script src="js/gym.js?v=3"></script>
-<script src="js/mobility.js?v=3"></script>
-<script src="js/rehab.js?v=1"></script>
-<script src="js/progress.js?v=3"></script>
-<script src="js/calendar.js?v=3"></script>
-<script src="js/main.js?v=3"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/utils.js?v=4"></script>
+<script src="js/gym.js?v=4"></script>
+<script src="js/mobility.js?v=4"></script>
+<script src="js/rehab.js?v=4"></script>
+<script src="js/progress.js?v=4"></script>
+<script src="js/calendar.js?v=4"></script>
+<script src="js/main.js?v=4"></script>
 </body>
 </html>

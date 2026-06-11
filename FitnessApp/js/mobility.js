@@ -1330,7 +1330,6 @@
     const now        = new Date();
     const dateStr    = toDateStr(now);
     const dow        = now.getDay();
-    const physio     = !!loadSettings().physioCleared;
     const dayInfo    = MOB_DAY_INFO[dow];
 
     document.getElementById('mob-day-name').textContent      = dayInfo.name;
@@ -1351,9 +1350,7 @@
     const lockedExs = MOB_LOCKED_DEEPER[dow] || [];
     let deeperHtml  = poolPicks.map(ex => buildMobExRowNew(ex, dateStr)).join('');
     if (lockedExs.length) {
-      deeperHtml += physio
-        ? lockedExs.map(ex => buildMobExRowNew(ex, dateStr)).join('')
-        : lockedExs.map(ex => buildLockedMobRowNew(ex)).join('');
+      deeperHtml += lockedExs.map(ex => buildMobExRowNew(ex, dateStr)).join('');
     }
     document.getElementById('mob-deeper-list').innerHTML = deeperHtml;
 
