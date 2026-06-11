@@ -1267,7 +1267,8 @@
       <div class="mob-caution-body">${ex.caution}</div>` : '';
 
     const detail   = MOB_DETAILS[ex.id];
-    const howToHtml = detail ? buildMobDetailHtml(ex.id, detail) : '';
+    let howToHtml = '';
+    try { if (detail) howToHtml = buildMobDetailHtml(ex.id, detail); } catch(e) { console.warn('Detail failed for', ex.id, e); }
 
     return `<div class="mob-ex-row${doneClass}" data-ex-id="${ex.id}">
       <div class="mob-ex-check-new" onclick="toggleMobTick('${ex.id}','${dateStr}')">
@@ -1332,15 +1333,23 @@
     const dow        = now.getDay();
     const dayInfo    = MOB_DAY_INFO[dow];
 
-    document.getElementById('mob-day-name').textContent      = dayInfo.name;
-    document.getElementById('mob-day-type').textContent      = `${dayInfo.type} · ~30 min`;
-    document.getElementById('mob-day-rationale').textContent = dayInfo.rationale;
+    const nameEl = document.getElementById('mob-day-name');
+    const typeEl = document.getElementById('mob-day-type');
+    const ratiEl = document.getElementById('mob-day-rationale');
+    if (nameEl) nameEl.textContent = dayInfo.name;
+    if (typeEl) typeEl.textContent = `${dayInfo.type} · ~30 min`;
+    if (ratiEl) ratiEl.textContent = dayInfo.rationale;
 
     checkMobWarningBanner();
 
+    function safeRow(ex) {
+      try { return buildMobExRowNew(ex, dateStr); }
+      catch(e) { console.warn('Exercise render failed:', ex.id, e); return ''; }
+    }
+
     // 4 essentials always shown
-    document.getElementById('mob-daily-list').innerHTML =
-      MOB_ESSENTIALS.map(ex => buildMobExRowNew(ex, dateStr)).join('');
+    const dailyEl = document.getElementById('mob-daily-list');
+    if (dailyEl) dailyEl.innerHTML = MOB_ESSENTIALS.map(safeRow).join('');
 
     // 6 from pool, seeded by date for variety
     const seed      = _dateSeed(dateStr);
@@ -1348,11 +1357,12 @@
     const poolPicks = shuffled.slice(0, 6);
 
     const lockedExs = MOB_LOCKED_DEEPER[dow] || [];
-    let deeperHtml  = poolPicks.map(ex => buildMobExRowNew(ex, dateStr)).join('');
+    let deeperHtml  = poolPicks.map(safeRow).join('');
     if (lockedExs.length) {
-      deeperHtml += lockedExs.map(ex => buildMobExRowNew(ex, dateStr)).join('');
+      deeperHtml += lockedExs.map(safeRow).join('');
     }
-    document.getElementById('mob-deeper-list').innerHTML = deeperHtml;
+    const deeperEl = document.getElementById('mob-deeper-list');
+    if (deeperEl) deeperEl.innerHTML = deeperHtml;
 
     updateMobProgress(dateStr);
     scheduleMobMidnightReset();
