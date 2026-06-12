@@ -731,6 +731,47 @@
 
   function persistGymDraft() { if (currentSession) writeJSON(KEY_GYM_DRAFT, currentSession); }
 
+  /* ─── REST TIMER ───────────────────────────────────────────────────
+     Self-contained countdown in the static gym screen (so it survives the
+     exercise-list re-render and keeps ticking across navigation). */
+  const REST_DEFAULT = 90;
+  let _restRemaining = REST_DEFAULT, _restRunning = false, _restInterval = null;
+
+  function restTimerRender() {
+    const disp = document.getElementById('rest-timer-display');
+    if (disp) {
+      const m = Math.floor(_restRemaining / 60), s = _restRemaining % 60;
+      disp.textContent = `${m}:${String(s).padStart(2, '0')}`;
+      disp.classList.toggle('rest-done', _restRemaining === 0);
+    }
+    const tog = document.getElementById('rest-timer-toggle');
+    if (tog) tog.textContent = _restRunning ? 'Pause' : (_restRemaining === 0 ? 'Reset' : 'Start');
+  }
+
+  function restTimerToggle() {
+    if (_restRunning) {
+      clearInterval(_restInterval); _restRunning = false;
+    } else {
+      if (_restRemaining <= 0) _restRemaining = REST_DEFAULT;
+      _restRunning = true;
+      _restInterval = setInterval(() => {
+        _restRemaining--;
+        if (_restRemaining <= 0) {
+          _restRemaining = 0; clearInterval(_restInterval); _restRunning = false;
+          if (navigator.vibrate) navigator.vibrate(200);
+        }
+        restTimerRender();
+      }, 1000);
+    }
+    restTimerRender();
+  }
+
+  function restTimerAdjust(delta) {
+    _restRemaining = Math.max(0, _restRemaining + delta);
+    if (_restRemaining === 0 && _restRunning) { clearInterval(_restInterval); _restRunning = false; }
+    restTimerRender();
+  }
+
   /* ─── GYM LOGGER RENDER ─────────────────────────────────────────── */
   function renderGymLogger() {
     const today     = new Date();
@@ -801,6 +842,8 @@
     list.oninput  = onEdit;
     list.onchange = onEdit;
     list.onclick  = onEdit; // also catch skip / remove-set taps
+
+    restTimerRender(); // sync the rest-timer display with current state
   }
 
   /* ─── PROGRESSIVE OVERLOAD ──────────────────────────────────────── */

@@ -154,7 +154,11 @@
     // Progress HR button
     document.getElementById('btn-log-hr').addEventListener('click', () => {
       const val = parseFloat(document.getElementById('hr-input').value);
-      if (isNaN(val) || val < 30 || val > 200) { alert('Please enter a valid HR (30–200 bpm)'); return; }
+      if (isNaN(val) || val < 30 || val > 200) {
+        const d = document.getElementById('hr-today-display');
+        if (d) d.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:6px 0">Enter a valid resting HR (30–200 bpm)</div>';
+        return;
+      }
       saveHrEntry(val);
     });
 

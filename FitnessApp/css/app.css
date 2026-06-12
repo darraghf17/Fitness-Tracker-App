@@ -1019,6 +1019,34 @@
     }
     .subtab.active { background: var(--primary); color: #fff; }
 
+    /* ── Rest timer (gym screen) ── */
+    .rest-timer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border-radius: var(--radius-btn);
+      box-shadow: var(--shadow);
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+    .rest-timer-label { font-size: 13px; font-weight: 600; color: var(--text-sec); margin-right: auto; }
+    .rest-timer-display {
+      font-size: 20px; font-weight: 700; color: var(--text);
+      font-variant-numeric: tabular-nums; min-width: 56px; text-align: center;
+    }
+    .rest-timer-display.rest-done { color: var(--success); }
+    .rest-btn {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      border-radius: var(--radius-input);
+      padding: 6px 10px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+    }
+    .rest-btn-go { background: var(--primary); color: #fff; border-color: var(--primary); min-width: 56px; }
+
     /* Settings gear on the home hero */
     .home-gear {
       position: absolute;
