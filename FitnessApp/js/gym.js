@@ -494,12 +494,12 @@
 
   /* ─── GYM LOGGER HELPERS ────────────────────────────────────────── */
   function getTimedTarget(exId, defaultSec) {
-    try { const t = JSON.parse(localStorage.getItem('tt_ex_targets')||'{}'); return t[exId] || defaultSec; }
-    catch { return defaultSec; }
+    return readJSON(KEYS.exTargets, {})[exId] || defaultSec;
   }
   function setTimedTarget(exId, sec) {
-    try { const t = JSON.parse(localStorage.getItem('tt_ex_targets')||'{}'); t[exId]=sec; localStorage.setItem('tt_ex_targets',JSON.stringify(t)); }
-    catch {}
+    const t = readJSON(KEYS.exTargets, {});
+    t[exId] = sec;
+    writeJSON(KEYS.exTargets, t);
   }
 
   function getLastGymEx(exId) {
@@ -525,6 +525,25 @@
     def = def == null ? '3' : String(def);
     const LABELS = { '1':'1 — easy', '2':'2 — moderate', '3':'3 — hard', '4':'4 — very hard', '5':'5 — max' };
     return ['1','2','3','4','5'].map(v => `<option value="${v}"${v === def ? ' selected' : ''}>${LABELS[v]}</option>`).join('');
+  }
+
+  /* ─── WEIGHT HELPERS (single source of truth for BW handling) ───── */
+  // True for exercises loaded as bodyweight or assisted — their weight input
+  // means "kg added" (0 ⇒ pure bodyweight).
+  function isBodyweightEx(ex) { return ex.weight === 'BW' || ex.type === 'assisted'; }
+
+  // Numeric value to show in a weight input given a stored default.
+  function displayWeight(ex, defW) {
+    if (isBodyweightEx(ex)) return defW === 'BW' ? 0 : defW;
+    return defW;
+  }
+
+  // Normalise a raw input string into what we persist: 'BW' for an empty
+  // bodyweight load, a number when parseable, else the raw string.
+  function normaliseSavedWeight(ex, rawValue) {
+    const num = parseFloat(rawValue);
+    if (isBodyweightEx(ex) && num === 0) return 'BW';
+    return isNaN(num) ? rawValue : num;
   }
 
   function buildSetRows(ex, lastData) {
@@ -553,9 +572,8 @@
           <button type="button" class="btn-remove-set" onclick="this.closest('.set-row').remove()" title="Remove set">×</button>
         </div>`;
       } else {
-        const isBW  = ex.weight === 'BW' || ex.type === 'assisted';
-        const wVal  = isBW ? (defW === 'BW' ? 0 : defW) : defW;
-        const wUnit = isBW ? 'kg added' : 'kg';
+        const wVal  = displayWeight(ex, defW);
+        const wUnit = isBodyweightEx(ex) ? 'kg added' : 'kg';
         html += `<div class="set-row">
           <span class="set-lbl">Set ${i+1}</span>
           <div class="input-unit-wrap">
@@ -629,46 +647,54 @@
     return Math.round(totalSec / 60);
   }
 
-  /* ─── DRAFT PERSISTENCE ────────────────────────────────────────── */
-  const KEY_GYM_DRAFT = 'tt_gym_draft';
+  /* ─── IN-PROGRESS SESSION STATE ────────────────────────────────────
+     `currentSession` is the single source of truth for the gym session being
+     logged: { date, inputs: { exId: { sets, notes, skipped } } }. It lives in
+     memory (so it survives SPA navigation) and is mirrored to localStorage as a
+     draft (so it survives a reload). Inputs are captured into it synchronously
+     on every edit, which is what removes the old debounce data-loss race —
+     re-rendering the screen now re-applies fresh state, not a stale draft. */
+  const KEY_GYM_DRAFT = KEYS.gymDraft;
   let _draftTimer = null;
+  let currentSession = null;
 
-  function saveGymDraft() {
-    const todayStr = toDateStr(new Date());
-    const draft = { date: todayStr, inputs: {} };
+  // Read the live input surface into the normalised inputs shape. The ONLY
+  // place that extracts values out of the gym DOM — used by both draft saves
+  // and the final session save, so they can never diverge.
+  function captureGymInputs() {
+    const inputs = {};
     document.querySelectorAll('#gym-exercise-list .ex-card').forEach(card => {
       const exId = card.dataset.exId;
       if (!exId) return;
       const sets = [];
       card.querySelectorAll('.set-row').forEach(row => {
-        const w = row.querySelector('.sel-weight');
-        const r = row.querySelector('.sel-reps');
-        const rir = row.querySelector('.sel-rir');
         const s = row.querySelector('.sel-secs');
-        if (s) sets.push({ secs: s.value });
-        else if (w) sets.push({ weight: w.value, reps: r?.value, rir: rir?.value });
+        if (s) { sets.push({ secs: s.value }); return; }
+        const w = row.querySelector('.sel-weight');
+        if (!w) return;
+        sets.push({
+          weight: w.value,
+          reps:   row.querySelector('.sel-reps')?.value,
+          rir:    row.querySelector('.sel-rir')?.value,
+        });
       });
-      draft.inputs[exId] = {
+      inputs[exId] = {
         sets,
-        notes: card.querySelector('.ex-notes')?.value || '',
+        notes:   card.querySelector('.ex-notes')?.value || '',
         skipped: card.dataset.skipped === 'true',
       };
     });
-    localStorage.setItem(KEY_GYM_DRAFT, JSON.stringify(draft));
+    return inputs;
   }
 
-  function restoreGymDraft(todayStr) {
-    let draft;
-    try { draft = JSON.parse(localStorage.getItem(KEY_GYM_DRAFT) || 'null'); } catch { return; }
-    if (!draft || draft.date !== todayStr) return;
-
+  // Apply a saved inputs object back onto freshly-rendered cards.
+  function applyGymInputs(inputs) {
     document.querySelectorAll('#gym-exercise-list .ex-card').forEach(card => {
-      const exId = card.dataset.exId;
-      const saved = draft.inputs[exId];
+      const saved = inputs[card.dataset.exId];
       if (!saved) return;
 
       const setRows = [...card.querySelectorAll('.set-row')];
-      saved.sets.forEach((s, i) => {
+      (saved.sets || []).forEach((s, i) => {
         const row = setRows[i];
         if (!row) return;
         if (s.secs !== undefined) {
@@ -678,8 +704,8 @@
           const w = row.querySelector('.sel-weight');
           const r = row.querySelector('.sel-reps');
           const rir = row.querySelector('.sel-rir');
-          if (w) w.value = s.weight;
-          if (r) r.value = s.reps;
+          if (w)   w.value = s.weight;
+          if (r)   r.value = s.reps;
           if (rir) rir.value = s.rir;
         }
       });
@@ -695,6 +721,15 @@
       }
     });
   }
+
+  // Synchronously capture the DOM into currentSession (no debounce → no race).
+  function syncGymState() {
+    const todayStr = toDateStr(new Date());
+    if (!currentSession || currentSession.date !== todayStr) currentSession = { date: todayStr, inputs: {} };
+    currentSession.inputs = captureGymInputs();
+  }
+
+  function persistGymDraft() { if (currentSession) writeJSON(KEY_GYM_DRAFT, currentSession); }
 
   /* ─── GYM LOGGER RENDER ─────────────────────────────────────────── */
   function renderGymLogger() {
@@ -725,14 +760,19 @@
       if (completeBtn) completeBtn.closest('.complete-wrap').style.display = 'none';
     } else {
       document.getElementById('gym-exercise-list').innerHTML = exercises.map(renderExCard).join('');
-      if (completeBtn) completeBtn.closest('.complete-wrap').style.display = '';
+      if (completeBtn) {
+        completeBtn.closest('.complete-wrap').style.display = '';
+        completeBtn.style.display = '';   // restore after a prior save hid it
+      }
+      clearGymFeedback();
+      _stapleAck = false;
     }
 
     // Duration estimate banner
     const banner = document.getElementById('gym-duration-banner');
     if (banner && exercises.length) {
       const estMin = calcEstDuration(exercises, dayType);
-      const startKey = 'tt_gym_start_' + todayStr;
+      const startKey = gymStartKey(todayStr);
       const startTime = parseInt(localStorage.getItem(startKey) || '0');
       if (!startTime) localStorage.setItem(startKey, String(Date.now()));
       const elapsed = startTime ? Math.floor((Date.now() - startTime) / 60000) : 0;
@@ -741,17 +781,26 @@
       banner.innerHTML = `<i class="fa-regular fa-clock"></i> Est. ~<strong>${estMin} min</strong>${elapsedStr}`;
     }
 
-    restoreGymDraft(todayStr);
+    // Seed state from memory (survives navigation) or the persisted draft
+    // (survives a reload), then mirror it onto the freshly-rendered inputs.
+    if (!currentSession || currentSession.date !== todayStr) {
+      const draft = readJSON(KEY_GYM_DRAFT, null);
+      currentSession = (draft && draft.date === todayStr) ? draft : { date: todayStr, inputs: {} };
+    }
+    applyGymInputs(currentSession.inputs);
 
+    // Capture every edit synchronously; debounce only the localStorage mirror.
+    // Assigning the handler (vs addEventListener) keeps it idempotent across
+    // re-renders instead of stacking duplicate listeners.
     const list = document.getElementById('gym-exercise-list');
-    list.addEventListener('input', () => {
+    const onEdit = () => {
+      syncGymState();
       clearTimeout(_draftTimer);
-      _draftTimer = setTimeout(saveGymDraft, 500);
-    });
-    list.addEventListener('change', () => {
-      clearTimeout(_draftTimer);
-      _draftTimer = setTimeout(saveGymDraft, 500);
-    });
+      _draftTimer = setTimeout(persistGymDraft, 400);
+    };
+    list.oninput  = onEdit;
+    list.onchange = onEdit;
+    list.onclick  = onEdit; // also catch skip / remove-set taps
   }
 
   /* ─── PROGRESSIVE OVERLOAD ──────────────────────────────────────── */
@@ -797,7 +846,79 @@
     return out;
   }
 
+  /* ─── SESSION BUILDER (pure) ───────────────────────────────────────
+     Turns the captured `inputs` map into the persisted exercise array plus
+     progression alerts. Pure (aside from checkOverload's storage read), so it
+     is unit-testable without a DOM. */
+  function buildSessionExercises(exercises, inputs) {
+    const exerciseData = [];
+    const progressionAlerts = [];
+
+    exercises.forEach(ex => {
+      if (ex.type === 'zone2') return;
+      const inp = inputs[ex.id];
+      if (!inp) return;                       // exercise not on screen
+
+      if (inp.skipped) {
+        exerciseData.push({ id:ex.id, name:ex.name, sets:[], notes:'', skipped:true, progressionFlag:false, stallFlag:false });
+        return;
+      }
+
+      let sets;
+      if (ex.type === 'timed') {
+        sets = (inp.sets || []).map((s, i) => ({ setNum:i+1, secs: parseInt(s.secs) || 0 }));
+      } else {
+        sets = (inp.sets || []).filter(s => s.weight !== undefined).map((s, i) => ({
+          setNum: i+1,
+          weight: normaliseSavedWeight(ex, s.weight),
+          reps:   parseInt(s.reps) || 0,
+          rir:    s.rir,
+        }));
+      }
+
+      const flags = checkOverload(ex, sets);
+      if (flags.ready && flags.nextWeight !== null) {
+        progressionAlerts.push({ exercise: ex.name, suggestedWeight: flags.nextWeight });
+      }
+      exerciseData.push({ id:ex.id, name:ex.name, sets, notes: inp.notes || '', progressionFlag:flags.ready, stallFlag:flags.stall });
+    });
+
+    return { exerciseData, progressionAlerts };
+  }
+
+  /* ─── INLINE SAVE FEEDBACK (replaces alert/confirm) ────────────────── */
+  function showGymFeedback(html) {
+    const el = document.getElementById('gym-save-feedback');
+    if (el) { el.innerHTML = html; el.style.display = 'block'; }
+  }
+  function clearGymFeedback() {
+    const el = document.getElementById('gym-save-feedback');
+    if (el) { el.innerHTML = ''; el.style.display = 'none'; }
+  }
+  function showGymSavedSummary(progressionAlerts, stalls) {
+    const btn = document.getElementById('btn-complete-session');
+    if (btn) btn.style.display = 'none';      // prevent a duplicate save
+    let html = `<div class="card" style="border-left:3px solid var(--success)">
+      <div class="card-title"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> Session saved</div>`;
+    if (progressionAlerts.length) {
+      html += `<div style="margin-top:8px;font-weight:600;font-size:13px">↑ Ready to progress</div>` +
+        progressionAlerts.map(a => `<div class="overload-cta">${a.exercise} → ${a.suggestedWeight} kg</div>`).join('');
+    }
+    if (stalls.length) {
+      html += `<div style="margin-top:8px;font-weight:600;font-size:13px;color:#c0392b">⚠ Stall alert</div>` +
+        stalls.map(e => `<div class="overload-cta">${e.name}</div>`).join('');
+    }
+    if (!progressionAlerts.length && !stalls.length) {
+      html += `<div class="overload-cta" style="margin-top:6px">Nice work — logged and saved.</div>`;
+    }
+    html += `<button class="btn btn-primary" style="margin-top:12px" onclick="navigateTo('screen-home')">
+      <i class="fa-solid fa-house"></i> Back to home</button></div>`;
+    showGymFeedback(html);
+  }
+
   /* ─── SAVE GYM SESSION ──────────────────────────────────────────── */
+  let _stapleAck = false;
+
   function saveGymSession() {
     const today     = new Date();
     const todayStr  = toDateStr(today);
@@ -806,15 +927,22 @@
     const dayType   = getDayType(blockName, today);
     const exercises = GYM_EXERCISES[dayType] || [];
 
-    // STAPLE check — only warn on days that include staple exercises
+    // STAPLE check — inline & non-blocking: warn once, save on the next tap.
     const staplesToday = exercises.filter(e => e.staple);
-    if (staplesToday.length > 0) {
+    if (staplesToday.length > 0 && !_stapleAck) {
       const hasER = staplesToday.some(e => e.name.toLowerCase().includes('external rotation'));
       const hasWC = staplesToday.some(e => e.name.toLowerCase().includes('wrist curl'));
       if (!hasER || !hasWC) {
-        if (!confirm('STAPLE exercises missing from today\'s plan — are you sure?')) return;
+        _stapleAck = true;
+        showGymFeedback(`<div class="overload-alert" style="background:rgba(200,120,0,0.12)">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div><div class="overload-exname">STAPLE exercises missing from today's plan</div>
+          <div class="overload-cta">Tap Complete again to save anyway.</div></div></div>`);
+        return;
       }
     }
+
+    syncGymState(); // ensure currentSession reflects the latest inputs
 
     const painScore   = parseInt(document.getElementById('pain-slider').value);
     const energyScore = parseInt(document.getElementById('energy-slider').value);
@@ -828,59 +956,19 @@
       };
     }
 
-    const exerciseData     = [];
-    const progressionAlerts = [];
-
-    exercises.forEach(ex => {
-      if (ex.type === 'zone2') return;
-      const card = document.querySelector(`[data-ex-id="${ex.id}"]`);
-      if (!card) return;
-
-      if (card.dataset.skipped === 'true') {
-        exerciseData.push({ id:ex.id, name:ex.name, sets:[], notes:'', skipped:true, progressionFlag:false, stallFlag:false });
-        return;
-      }
-
-      let sets = [];
-      if (ex.type === 'timed') {
-        card.querySelectorAll('.sel-secs').forEach((inp, i) => {
-          sets.push({ setNum: i+1, secs: parseInt(inp.value) || 0 });
-        });
-      } else {
-        card.querySelectorAll('.set-row').forEach((row, i) => {
-          const wEl  = row.querySelector('.sel-weight');
-          const rEl  = row.querySelector('.sel-reps');
-          const rirEl= row.querySelector('.sel-rir');
-          if (!wEl) return;
-          const rawW = parseFloat(wEl.value);
-          const isBWEx = ex.weight === 'BW' || ex.type === 'assisted';
-          const weight = (isBWEx && rawW === 0) ? 'BW' : (isNaN(rawW) ? wEl.value : rawW);
-          sets.push({ setNum:i+1, weight, reps:parseInt(rEl.value)||0, rir:rirEl.value });
-        });
-      }
-
-      const notes = card.querySelector('.ex-notes')?.value || '';
-      const flags = checkOverload(ex, sets);
-      if (flags.ready && flags.nextWeight !== null) {
-        progressionAlerts.push({ exercise: ex.name, suggestedWeight: flags.nextWeight });
-      }
-      exerciseData.push({ id:ex.id, name:ex.name, sets, notes, progressionFlag:flags.ready, stallFlag:flags.stall });
-    });
+    const { exerciseData, progressionAlerts } = buildSessionExercises(exercises, currentSession.inputs);
 
     const session = { date:todayStr, block:blockName, dayType, painScore, energyScore, zone2, exercises:exerciseData, progressionAlerts };
     const sessions = loadSessions(KEY_GYM);
     sessions.push(session);
-    localStorage.setItem(KEY_GYM, JSON.stringify(sessions));
-    localStorage.removeItem(KEY_GYM_DRAFT);
+    writeJSON(KEY_GYM, sessions);
+    removeKey(KEY_GYM_DRAFT);
+    currentSession = null;
+    _stapleAck = false;
 
     const stalls = exerciseData.filter(e => e.stallFlag);
-    let msg = 'Session saved!';
-    if (progressionAlerts.length) msg += `\n\n↑ Ready to progress:\n${progressionAlerts.map(a=>`${a.exercise} → ${a.suggestedWeight} kg`).join('\n')}`;
-    if (stalls.length) msg += `\n\n⚠ Stall alert:\n${stalls.map(e=>e.name).join('\n')}`;
-    alert(msg);
-
+    showGymSavedSummary(progressionAlerts, stalls);
     renderDashboard();
-    navigateTo('screen-home');
   }
 
   /* ─── GYM LOGGER INIT ───────────────────────────────────────────── */

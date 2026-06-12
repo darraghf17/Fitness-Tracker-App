@@ -115,14 +115,7 @@
     });
 
     document.getElementById('btn-export').addEventListener('click', () => {
-      const data = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('tt_')) {
-          try { data[k] = JSON.parse(localStorage.getItem(k)); }
-          catch { data[k] = localStorage.getItem(k); }
-        }
-      }
+      const data = exportAll();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url  = URL.createObjectURL(blob);
       const a    = Object.assign(document.createElement('a'), { href: url, download: `training-data-${toDateStr(new Date())}.json` });
@@ -137,9 +130,7 @@
       reader.onload = ev => {
         try {
           const data = JSON.parse(ev.target.result);
-          Object.entries(data).forEach(([k, v]) => {
-            localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
-          });
+          if (!importAll(data)) throw new Error('bad blob');
           renderSettings();
           renderDashboard();
           alert('Data imported successfully.');

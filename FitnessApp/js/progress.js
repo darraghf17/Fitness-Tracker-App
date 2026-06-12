@@ -1,9 +1,9 @@
   /* ═══════════════════════════════════════════════════════════════════
      PROGRESS / BENCHMARKS
   ═══════════════════════════════════════════════════════════════════ */
-  const KEY_HR           = 'tt_resting_hr';
-  const KEY_BENCH_DATA   = 'tt_bench_data';
-  const KEY_BENCH_HIST   = 'tt_bench_history';
+  const KEY_HR           = KEYS.hr;
+  const KEY_BENCH_DATA   = KEYS.benchData;
+  const KEY_BENCH_HIST   = KEYS.benchHist;
   let   _benchCharts     = {};
 
   const BENCHMARKS_DEF = [
@@ -16,15 +16,15 @@
     { id:'b-resthr',   name:'Resting HR',                   unit:'bpm',  baseline:75,   target:65,  lowerBetter:true  },
   ];
 
-  function loadBenchData() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_DATA) || '{}'); } catch { return {}; } }
-  function saveBenchData(d) { localStorage.setItem(KEY_BENCH_DATA, JSON.stringify(d)); }
+  function loadBenchData() { return readJSON(KEY_BENCH_DATA, {}); }
+  function saveBenchData(d) { writeJSON(KEY_BENCH_DATA, d); }
 
-  function loadBenchHistory() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_HIST) || '{}'); } catch { return {}; } }
+  function loadBenchHistory() { return readJSON(KEY_BENCH_HIST, {}); }
   function addBenchEntry(id, value) {
     const all = loadBenchHistory();
     if (!all[id]) all[id] = [];
     all[id].push({ date: toDateStr(new Date()), value: parseFloat(value) });
-    localStorage.setItem(KEY_BENCH_HIST, JSON.stringify(all));
+    writeJSON(KEY_BENCH_HIST, all);
   }
 
   function benchPct(def, current) {
@@ -36,7 +36,7 @@
     return span > 0 ? Math.min(100, Math.max(0, ((current - def.baseline) / span) * 100)) : 0;
   }
 
-  function loadHrData() { try { return JSON.parse(localStorage.getItem(KEY_HR) || '[]'); } catch { return []; } }
+  function loadHrData() { return readJSON(KEY_HR, []); }
 
   function renderProgress() {
     renderHrDisplay();
@@ -63,7 +63,7 @@
     const todayStr = toDateStr(new Date());
     const idx = data.findIndex(e => e.date === todayStr);
     if (idx >= 0) data[idx].value = value; else data.push({ date: todayStr, value });
-    localStorage.setItem(KEY_HR, JSON.stringify(data));
+    writeJSON(KEY_HR, data);
     addBenchEntry('b-resthr', value);
     const d = loadBenchData(); d['b-resthr'] = value; saveBenchData(d);
     renderHrDisplay();

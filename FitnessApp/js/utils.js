@@ -1,23 +1,27 @@
 
   function loadSettings() {
-    try { return { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem(KEY_SETTINGS) || '{}') }; }
-    catch { return { ...SETTING_DEFAULTS }; }
+    return { ...SETTING_DEFAULTS, ...readJSON(KEY_SETTINGS, {}) };
   }
 
   function saveSettings(patch) {
     const updated = { ...loadSettings(), ...patch };
-    localStorage.setItem(KEY_SETTINGS, JSON.stringify(updated));
+    writeJSON(KEY_SETTINGS, updated);
     return updated;
   }
 
   /* ─── SESSION DATA ──────────────────────────────────────────────── */
   function loadSessions(key) {
-    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-    catch { return []; }
+    return readJSON(key, []);
   }
 
   /* ─── HELPERS ───────────────────────────────────────────────────── */
-  function toDateStr(d) { return d.toISOString().slice(0, 10); }
+  function toDateStr(d) {
+    // Local date (not UTC) — avoids the day rolling early in timezones ahead of UTC
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
 
   function getAutoBlock(dateStr) {
     const d = new Date(dateStr + 'T00:00:00');
