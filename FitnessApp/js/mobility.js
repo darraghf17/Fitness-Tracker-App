@@ -974,7 +974,7 @@
         goal: 'Full bilateral overhead shoulder flexion — left arm matching the right, approximately 170–180 degrees of shoulder flexion, pain-free at end range.',
         time: '12–16 weeks for meaningful overhead range improvement. Shoulder overhead restriction is one of the more challenging restrictions to reverse — but consistent daily end-range loading is the most effective approach.'
       }
-    }
+    },
 
     /* ── Leg flexibility exercises ─────────────────────────────── */
     'mob-leg1': {
