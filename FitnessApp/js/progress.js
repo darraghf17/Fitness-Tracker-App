@@ -39,9 +39,36 @@
   function loadHrData() { return readJSON(KEY_HR, []); }
 
   function renderProgress() {
+    renderWeeklyLoad();
     renderHrDisplay();
     renderBenchCards();
     renderZone2History();
+  }
+
+  /* Unified weekly load — strength, engine, mobility and rehab in one view. */
+  function renderWeeklyLoad() {
+    const el = document.getElementById('weekly-load-card');
+    if (!el) return;
+    const wl = weeklyLoad();
+    const range = `${formatDisplayDate(wl.weekStart)} – ${formatDisplayDate(wl.weekEnd)}`;
+    const ratioStr = (wl.pullSets || wl.pushSets)
+      ? (wl.pullPushRatio === null ? '∞' : `${wl.pullPushRatio}:1`) : '—';
+    el.innerHTML = `<div class="card">
+      <div class="card-title">This Week <span style="font-size:12px;color:var(--text-sec);font-weight:400"> · ${range}</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="stat-box"><div class="val">${wl.gymSessions}</div><div class="lbl">Gym sessions</div></div>
+        <div class="stat-box"><div class="val">${wl.tonnage.toLocaleString()}</div><div class="lbl">Volume (kg)</div></div>
+        <div class="stat-box"><div class="val">${wl.workingSets}</div><div class="lbl">Working sets</div></div>
+        <div class="stat-box"><div class="val">${wl.engineMinutes}</div><div class="lbl">Engine (min)</div></div>
+        <div class="stat-box"><div class="val">${wl.mobilityDays}</div><div class="lbl">Mobility days</div></div>
+        <div class="stat-box"><div class="val">${wl.rehabDays}</div><div class="lbl">Rehab days</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-sec);line-height:1.5">
+        Pull : Push <strong>${ratioStr}</strong> &nbsp;·&nbsp; Volume by area —
+        pull ${wl.byCategory.pull.toLocaleString()} · push ${wl.byCategory.push.toLocaleString()} ·
+        lower ${wl.byCategory.lower.toLocaleString()} · core ${wl.byCategory.core.toLocaleString()} kg
+      </div>
+    </div>`;
   }
 
   function renderHrDisplay() {
@@ -84,6 +111,15 @@
       const pct = Math.round(benchPct(def, current));
       const history = (hist[def.id] || []).slice(-10);
       const hasSparkline = history.length >= 2;
+
+      // Auto-derived "logged best" from gym sessions — non-destructive: the
+      // athlete taps to apply it rather than us silently overwriting their value.
+      const derived = (typeof derivedBenchmark === 'function') ? derivedBenchmark(def.id) : null;
+      const suggestHtml = (derived && derived.value !== current)
+        ? `<div class="bench-suggest" onclick="updateBenchValue('${def.id}',${derived.value})"
+             style="margin-top:8px;font-size:12px;color:#4a7c59;cursor:pointer;font-weight:600">
+             <i class="fa-solid fa-wand-magic-sparkles"></i> Logged best: ${derived.value} ${def.unit} · ${formatDisplayDate(derived.date)} — tap to use</div>`
+        : '';
       return `<div class="card">
         <div class="card-title">${def.name}</div>
         <div class="bench-vals">
@@ -109,6 +145,7 @@
           <div class="bench-progress-fill" style="width:${pct}%"></div>
         </div>
         <div class="bench-progress-pct">${pct}% to target${def.lowerBetter ? ' (lower = better)' : ''}</div>
+        ${suggestHtml}
         ${hasSparkline ? `<div class="bench-sparkline-wrap"><canvas id="spark-${def.id}"></canvas></div>` : ''}
       </div>`;
     }).join('');
@@ -250,13 +287,21 @@
       const sorted  = sessions.slice().reverse();
       const labels  = sorted.map(s => s.date.slice(5));
       const weights = sorted.map(s => { const w = parseFloat(s.sets[0]?.weight); return isNaN(w) ? null : w; });
+      const e1rms   = sorted.map(s => bestSetE1RM(s.sets));   // estimated 1RM trend
+      const hasE1   = e1rms.some(v => v !== null);
       if (weights.some(w => w !== null)) {
+        const datasets = [
+          { label:'Working weight', data:weights, borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.1)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#4a7c59', tension:0.2, fill:true },
+        ];
+        if (hasE1) datasets.push(
+          { label:'Est. 1RM', data:e1rms, borderColor:'#b5762a', backgroundColor:'transparent', borderWidth:2, borderDash:[5,4], pointRadius:3, pointBackgroundColor:'#b5762a', tension:0.2, fill:false }
+        );
         _olWeightChart = new Chart(canvas, {
           type:'line',
-          data:{ labels, datasets:[{ data:weights, borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.1)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#4a7c59', tension:0.2, fill:true }] },
+          data:{ labels, datasets },
           options:{
             responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ display:false } },
+            plugins:{ legend:{ display:hasE1, position:'bottom', labels:{ boxWidth:12, font:{ size:11 } } } },
             scales:{ x:{ ticks:{ font:{ size:10 }, maxRotation:0 }, grid:{ display:false } }, y:{ ticks:{ font:{ size:11 } } } },
           },
         });
@@ -295,6 +340,11 @@
     const wNum = parseFloat(currentWeight);
     const nextW = !isNaN(wNum) ? +(wNum + inc).toFixed(2) : null;
 
+    // Estimated 1RM — latest session and all-time best for this lift.
+    const latestE1 = bestSetE1RM(latest.sets);
+    const e1all    = sessions.map(s => bestSetE1RM(s.sets)).filter(v => v != null);
+    const bestE1   = e1all.length ? Math.max(...e1all) : null;
+
     sec.innerHTML = `<div class="card">
       <div class="card-title">Progression Status</div>
       <div class="ol-status-badge ${statusClass}"><i class="fa-solid ${statusIcon}"></i> ${statusText}</div>
@@ -303,6 +353,8 @@
         <div class="stat-box"><div class="val">${repRangeStr} reps</div><div class="lbl">Rep range</div></div>
         <div class="stat-box"><div class="val">${sessionsAtWeight}</div><div class="lbl">Sessions at weight</div></div>
         <div class="stat-box"><div class="val">${nextW !== null ? nextW+' kg' : '—'}</div><div class="lbl">Suggested next</div></div>
+        <div class="stat-box"><div class="val">${latestE1 != null ? latestE1+' kg' : '—'}</div><div class="lbl">Est. 1RM (latest)</div></div>
+        <div class="stat-box"><div class="val">${bestE1 != null ? bestE1+' kg' : '—'}</div><div class="lbl">Est. 1RM (best)</div></div>
       </div>
     </div>`;
   }
