@@ -1,7 +1,7 @@
   /* ═══════════════════════════════════════════════════════════════════
      MOBILITY LOGGER
   ═══════════════════════════════════════════════════════════════════ */
-  const KEY_MOB_PROG = 'tt_mob_prog';
+  const KEY_MOB_PROG = KEYS.mobProg;
 
   /* ── Date-seeded shuffle (same result each calendar day) ─────── */
   function _dateSeed(dateStr) {
@@ -1188,69 +1188,28 @@
       '</div>';
   }
 
-  /* ── Tick state persistence ─────────────────────────────────── */
-  function getMobTicks(dateStr) {
-    try {
-      const d = JSON.parse(localStorage.getItem(KEY_MOB_PROG) || '{}');
-      return (d.date === dateStr) ? (d.ticks || {}) : {};
-    } catch { return {}; }
-  }
-
-  function _persistMobTick(exId, checked, dateStr) {
-    try {
-      let d = JSON.parse(localStorage.getItem(KEY_MOB_PROG) || '{}');
-      if (d.date !== dateStr) d = { date: dateStr, ticks: {} };
-      d.ticks[exId] = checked;
-      localStorage.setItem(KEY_MOB_PROG, JSON.stringify(d));
-    } catch {}
-  }
-
-  function _saveMobSessionRecord(dateStr) {
-    const sessions = loadSessions(KEY_MOB);
-    if (sessions.some(s => s.date === dateStr)) return;
-    sessions.push({ date: dateStr, routine: 'Day Programme' });
-    localStorage.setItem(KEY_MOB, JSON.stringify(sessions));
-  }
-
-  /* Global — called from onclick attributes */
-  function toggleMobTick(exId, dateStr) {
-    const ticks = getMobTicks(dateStr);
-    const nowChecked = !ticks[exId];
-    _persistMobTick(exId, nowChecked, dateStr);
-
-    const row = document.querySelector(`.mob-ex-row[data-ex-id="${exId}"]`);
-    if (row) {
-      const cb = row.querySelector('.mob-checkbox');
-      if (nowChecked) { row.classList.add('mob-ex-done');    if (cb) cb.classList.add('checked'); }
-      else            { row.classList.remove('mob-ex-done'); if (cb) cb.classList.remove('checked'); }
-    }
-    updateMobProgress(dateStr);
-  }
-
-  function updateMobProgress(dateStr) {
-    const ticks = getMobTicks(dateStr);
-    const rows  = [...document.querySelectorAll(
+  /* ── Checklist engine wiring ────────────────────────────────────
+     The day's tickable set is whatever non-locked rows are on screen, so
+     getItemIds reads the DOM rather than a fixed list. */
+  const _mobChecklist = createChecklist({
+    progKey:        KEY_MOB_PROG,
+    sessionKey:     KEY_MOB,
+    sessionRecord:  dateStr => ({ date: dateStr, routine: 'Day Programme' }),
+    getItemIds:     () => [...document.querySelectorAll(
       '#mob-daily-list .mob-ex-row:not(.mob-row-locked-new), #mob-deeper-list .mob-ex-row:not(.mob-row-locked-new)'
-    )];
-    const allIds = rows.map(r => r.dataset.exId).filter(Boolean);
-    const done   = allIds.filter(id => ticks[id]).length;
-    const total  = allIds.length;
+    )].map(r => r.dataset.exId).filter(Boolean),
+    rowSelector:    id => `.mob-ex-row[data-ex-id="${id}"]`,
+    doneClass:      'mob-ex-done',
+    progressTextId: 'mob-progress-text',
+    progressFillId: 'mob-progress-fill',
+    completeText:   'Session complete &#127881;',
+    formatProgress: (done, total) => `${done} of ${total} exercises completed today`,
+  });
 
-    const textEl = document.getElementById('mob-progress-text');
-    const fillEl = document.getElementById('mob-progress-fill');
-    if (!textEl || !fillEl || total === 0) return;
-
-    const pct = Math.round((done / total) * 100);
-    fillEl.style.width = pct + '%';
-
-    if (done >= total) {
-      textEl.innerHTML = 'Session complete &#127881;';
-      _saveMobSessionRecord(dateStr);
-      renderDashboard();
-    } else {
-      textEl.textContent = `${done} of ${total} exercises completed today`;
-    }
-  }
+  // Global wrappers — referenced from row onclick / builders.
+  function getMobTicks(dateStr)      { return _mobChecklist.getTicks(dateStr); }
+  function toggleMobTick(exId, date) { _mobChecklist.toggle(exId, date); }
+  function updateMobProgress(date)   { _mobChecklist.updateProgress(date); }
 
   /* ── Row builders ───────────────────────────────────────────── */
   function buildMobExRowNew(ex, dateStr) {

@@ -1,23 +1,27 @@
 
   function loadSettings() {
-    try { return { ...SETTING_DEFAULTS, ...JSON.parse(localStorage.getItem(KEY_SETTINGS) || '{}') }; }
-    catch { return { ...SETTING_DEFAULTS }; }
+    return { ...SETTING_DEFAULTS, ...readJSON(KEY_SETTINGS, {}) };
   }
 
   function saveSettings(patch) {
     const updated = { ...loadSettings(), ...patch };
-    localStorage.setItem(KEY_SETTINGS, JSON.stringify(updated));
+    writeJSON(KEY_SETTINGS, updated);
     return updated;
   }
 
   /* ─── SESSION DATA ──────────────────────────────────────────────── */
   function loadSessions(key) {
-    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-    catch { return []; }
+    return readJSON(key, []);
   }
 
   /* ─── HELPERS ───────────────────────────────────────────────────── */
-  function toDateStr(d) { return d.toISOString().slice(0, 10); }
+  function toDateStr(d) {
+    // Local date (not UTC) — avoids the day rolling early in timezones ahead of UTC
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
 
   function getAutoBlock(dateStr) {
     const d = new Date(dateStr + 'T00:00:00');
@@ -58,18 +62,37 @@
   }
 
   /* ─── NAVIGATION ────────────────────────────────────────────────── */
+  // Several screens share one bottom-nav tab (Recovery groups mobility+rehab;
+  // Insights groups progress+overload+report; settings keeps Home lit). This
+  // maps a screen to the tab that should highlight while it's open.
+  const NAV_GROUP = {
+    'screen-home':     'screen-home',
+    'screen-gym':      'screen-gym',
+    'screen-mobility': 'screen-mobility',
+    'screen-rehab':    'screen-mobility',
+    'screen-progress': 'screen-progress',
+    'screen-overload': 'screen-progress',
+    'screen-report':   'screen-progress',
+    'screen-calendar': 'screen-calendar',
+    'screen-settings': 'screen-home',
+  };
+
   function navigateTo(screenId) {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const tab = document.querySelector(`.nav-tab[data-target="${screenId}"]`);
+    const tab = document.querySelector(`.nav-tab[data-target="${NAV_GROUP[screenId] || screenId}"]`);
     if (tab) tab.classList.add('active');
     const scr = document.getElementById(screenId);
     if (scr) scr.classList.add('active');
+    window.scrollTo(0, 0);
+    if (screenId === 'screen-home')     renderDashboard();
     if (screenId === 'screen-gym')      renderGymLogger();
     if (screenId === 'screen-mobility') renderMobilityLogger();
     if (screenId === 'screen-rehab')    renderRehabLogger();
     if (screenId === 'screen-progress') renderProgress();
     if (screenId === 'screen-overload') renderOverload();
+    if (screenId === 'screen-report')   renderReport();
+    if (screenId === 'screen-settings') renderSettings();
     if (screenId === 'screen-calendar') renderCalendar();
   }
 

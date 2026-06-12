@@ -115,14 +115,7 @@
     });
 
     document.getElementById('btn-export').addEventListener('click', () => {
-      const data = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('tt_')) {
-          try { data[k] = JSON.parse(localStorage.getItem(k)); }
-          catch { data[k] = localStorage.getItem(k); }
-        }
-      }
+      const data = exportAll();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url  = URL.createObjectURL(blob);
       const a    = Object.assign(document.createElement('a'), { href: url, download: `training-data-${toDateStr(new Date())}.json` });
@@ -137,9 +130,7 @@
       reader.onload = ev => {
         try {
           const data = JSON.parse(ev.target.result);
-          Object.entries(data).forEach(([k, v]) => {
-            localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
-          });
+          if (!importAll(data)) throw new Error('bad blob');
           renderSettings();
           renderDashboard();
           alert('Data imported successfully.');
@@ -153,12 +144,9 @@
 
   /* ─── INIT ──────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
+    // navigateTo handles the per-screen render (including home & settings).
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        navigateTo(tab.dataset.target);
-        if (tab.dataset.target === 'screen-home')     renderDashboard();
-        if (tab.dataset.target === 'screen-settings') renderSettings();
-      });
+      tab.addEventListener('click', () => navigateTo(tab.dataset.target));
     });
     initSettings();
     initGymLogger();
@@ -166,7 +154,11 @@
     // Progress HR button
     document.getElementById('btn-log-hr').addEventListener('click', () => {
       const val = parseFloat(document.getElementById('hr-input').value);
-      if (isNaN(val) || val < 30 || val > 200) { alert('Please enter a valid HR (30–200 bpm)'); return; }
+      if (isNaN(val) || val < 30 || val > 200) {
+        const d = document.getElementById('hr-today-display');
+        if (d) d.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:6px 0">Enter a valid resting HR (30–200 bpm)</div>';
+        return;
+      }
       saveHrEntry(val);
     });
 

@@ -1,9 +1,9 @@
   /* ═══════════════════════════════════════════════════════════════════
      PROGRESS / BENCHMARKS
   ═══════════════════════════════════════════════════════════════════ */
-  const KEY_HR           = 'tt_resting_hr';
-  const KEY_BENCH_DATA   = 'tt_bench_data';
-  const KEY_BENCH_HIST   = 'tt_bench_history';
+  const KEY_HR           = KEYS.hr;
+  const KEY_BENCH_DATA   = KEYS.benchData;
+  const KEY_BENCH_HIST   = KEYS.benchHist;
   let   _benchCharts     = {};
 
   const BENCHMARKS_DEF = [
@@ -16,15 +16,15 @@
     { id:'b-resthr',   name:'Resting HR',                   unit:'bpm',  baseline:75,   target:65,  lowerBetter:true  },
   ];
 
-  function loadBenchData() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_DATA) || '{}'); } catch { return {}; } }
-  function saveBenchData(d) { localStorage.setItem(KEY_BENCH_DATA, JSON.stringify(d)); }
+  function loadBenchData() { return readJSON(KEY_BENCH_DATA, {}); }
+  function saveBenchData(d) { writeJSON(KEY_BENCH_DATA, d); }
 
-  function loadBenchHistory() { try { return JSON.parse(localStorage.getItem(KEY_BENCH_HIST) || '{}'); } catch { return {}; } }
+  function loadBenchHistory() { return readJSON(KEY_BENCH_HIST, {}); }
   function addBenchEntry(id, value) {
     const all = loadBenchHistory();
     if (!all[id]) all[id] = [];
     all[id].push({ date: toDateStr(new Date()), value: parseFloat(value) });
-    localStorage.setItem(KEY_BENCH_HIST, JSON.stringify(all));
+    writeJSON(KEY_BENCH_HIST, all);
   }
 
   function benchPct(def, current) {
@@ -36,12 +36,39 @@
     return span > 0 ? Math.min(100, Math.max(0, ((current - def.baseline) / span) * 100)) : 0;
   }
 
-  function loadHrData() { try { return JSON.parse(localStorage.getItem(KEY_HR) || '[]'); } catch { return []; } }
+  function loadHrData() { return readJSON(KEY_HR, []); }
 
   function renderProgress() {
+    renderWeeklyLoad();
     renderHrDisplay();
     renderBenchCards();
     renderZone2History();
+  }
+
+  /* Unified weekly load — strength, engine, mobility and rehab in one view. */
+  function renderWeeklyLoad() {
+    const el = document.getElementById('weekly-load-card');
+    if (!el) return;
+    const wl = weeklyLoad();
+    const range = `${formatDisplayDate(wl.weekStart)} – ${formatDisplayDate(wl.weekEnd)}`;
+    const ratioStr = (wl.pullSets || wl.pushSets)
+      ? (wl.pullPushRatio === null ? '∞' : `${wl.pullPushRatio}:1`) : '—';
+    el.innerHTML = `<div class="card">
+      <div class="card-title">This Week <span style="font-size:12px;color:var(--text-sec);font-weight:400"> · ${range}</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="stat-box"><div class="val">${wl.gymSessions}</div><div class="lbl">Gym sessions</div></div>
+        <div class="stat-box"><div class="val">${wl.tonnage.toLocaleString()}</div><div class="lbl">Volume (kg)</div></div>
+        <div class="stat-box"><div class="val">${wl.workingSets}</div><div class="lbl">Working sets</div></div>
+        <div class="stat-box"><div class="val">${wl.engineMinutes}</div><div class="lbl">Engine (min)</div></div>
+        <div class="stat-box"><div class="val">${wl.mobilityDays}</div><div class="lbl">Mobility days</div></div>
+        <div class="stat-box"><div class="val">${wl.rehabDays}</div><div class="lbl">Rehab days</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-sec);line-height:1.5">
+        Pull : Push <strong>${ratioStr}</strong> &nbsp;·&nbsp; Volume by area —
+        pull ${wl.byCategory.pull.toLocaleString()} · push ${wl.byCategory.push.toLocaleString()} ·
+        lower ${wl.byCategory.lower.toLocaleString()} · core ${wl.byCategory.core.toLocaleString()} kg
+      </div>
+    </div>`;
   }
 
   function renderHrDisplay() {
@@ -63,7 +90,7 @@
     const todayStr = toDateStr(new Date());
     const idx = data.findIndex(e => e.date === todayStr);
     if (idx >= 0) data[idx].value = value; else data.push({ date: todayStr, value });
-    localStorage.setItem(KEY_HR, JSON.stringify(data));
+    writeJSON(KEY_HR, data);
     addBenchEntry('b-resthr', value);
     const d = loadBenchData(); d['b-resthr'] = value; saveBenchData(d);
     renderHrDisplay();
@@ -84,6 +111,15 @@
       const pct = Math.round(benchPct(def, current));
       const history = (hist[def.id] || []).slice(-10);
       const hasSparkline = history.length >= 2;
+
+      // Auto-derived "logged best" from gym sessions — non-destructive: the
+      // athlete taps to apply it rather than us silently overwriting their value.
+      const derived = (typeof derivedBenchmark === 'function') ? derivedBenchmark(def.id) : null;
+      const suggestHtml = (derived && derived.value !== current)
+        ? `<div class="bench-suggest" onclick="updateBenchValue('${def.id}',${derived.value})"
+             style="margin-top:8px;font-size:12px;color:#4a7c59;cursor:pointer;font-weight:600">
+             <i class="fa-solid fa-wand-magic-sparkles"></i> Logged best: ${derived.value} ${def.unit} · ${formatDisplayDate(derived.date)} — tap to use</div>`
+        : '';
       return `<div class="card">
         <div class="card-title">${def.name}</div>
         <div class="bench-vals">
@@ -109,6 +145,7 @@
           <div class="bench-progress-fill" style="width:${pct}%"></div>
         </div>
         <div class="bench-progress-pct">${pct}% to target${def.lowerBetter ? ' (lower = better)' : ''}</div>
+        ${suggestHtml}
         ${hasSparkline ? `<div class="bench-sparkline-wrap"><canvas id="spark-${def.id}"></canvas></div>` : ''}
       </div>`;
     }).join('');
@@ -250,13 +287,21 @@
       const sorted  = sessions.slice().reverse();
       const labels  = sorted.map(s => s.date.slice(5));
       const weights = sorted.map(s => { const w = parseFloat(s.sets[0]?.weight); return isNaN(w) ? null : w; });
+      const e1rms   = sorted.map(s => bestSetE1RM(s.sets));   // estimated 1RM trend
+      const hasE1   = e1rms.some(v => v !== null);
       if (weights.some(w => w !== null)) {
+        const datasets = [
+          { label:'Working weight', data:weights, borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.1)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#4a7c59', tension:0.2, fill:true },
+        ];
+        if (hasE1) datasets.push(
+          { label:'Est. 1RM', data:e1rms, borderColor:'#b5762a', backgroundColor:'transparent', borderWidth:2, borderDash:[5,4], pointRadius:3, pointBackgroundColor:'#b5762a', tension:0.2, fill:false }
+        );
         _olWeightChart = new Chart(canvas, {
           type:'line',
-          data:{ labels, datasets:[{ data:weights, borderColor:'#4a7c59', backgroundColor:'rgba(74,124,89,0.1)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#4a7c59', tension:0.2, fill:true }] },
+          data:{ labels, datasets },
           options:{
             responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ display:false } },
+            plugins:{ legend:{ display:hasE1, position:'bottom', labels:{ boxWidth:12, font:{ size:11 } } } },
             scales:{ x:{ ticks:{ font:{ size:10 }, maxRotation:0 }, grid:{ display:false } }, y:{ ticks:{ font:{ size:11 } } } },
           },
         });
@@ -295,6 +340,11 @@
     const wNum = parseFloat(currentWeight);
     const nextW = !isNaN(wNum) ? +(wNum + inc).toFixed(2) : null;
 
+    // Estimated 1RM — latest session and all-time best for this lift.
+    const latestE1 = bestSetE1RM(latest.sets);
+    const e1all    = sessions.map(s => bestSetE1RM(s.sets)).filter(v => v != null);
+    const bestE1   = e1all.length ? Math.max(...e1all) : null;
+
     sec.innerHTML = `<div class="card">
       <div class="card-title">Progression Status</div>
       <div class="ol-status-badge ${statusClass}"><i class="fa-solid ${statusIcon}"></i> ${statusText}</div>
@@ -303,6 +353,8 @@
         <div class="stat-box"><div class="val">${repRangeStr} reps</div><div class="lbl">Rep range</div></div>
         <div class="stat-box"><div class="val">${sessionsAtWeight}</div><div class="lbl">Sessions at weight</div></div>
         <div class="stat-box"><div class="val">${nextW !== null ? nextW+' kg' : '—'}</div><div class="lbl">Suggested next</div></div>
+        <div class="stat-box"><div class="val">${latestE1 != null ? latestE1+' kg' : '—'}</div><div class="lbl">Est. 1RM (latest)</div></div>
+        <div class="stat-box"><div class="val">${bestE1 != null ? bestE1+' kg' : '—'}</div><div class="lbl">Est. 1RM (best)</div></div>
       </div>
     </div>`;
   }
@@ -349,5 +401,84 @@
     const detail  = document.getElementById('pp-ratio-detail');
     if (display) { display.textContent = (ratio !== '0' && ratio !== '∞') ? `${ratio}:1` : ratio; display.className = `pp-ratio ${isGreen ? 'green' : 'red'}`; }
     if (detail)  detail.textContent = `${pull} pulling sets : ${push} pushing sets${push > 0 ? ` — ratio ${ratio}:1` : ''}`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     COACH REPORT
+  ═══════════════════════════════════════════════════════════════════ */
+  let _lastReport = '';
+
+  // Default the date range to the last 4 weeks when the screen opens.
+  function renderReport() {
+    const fromEl = document.getElementById('report-from');
+    const toEl   = document.getElementById('report-to');
+    if (toEl && !toEl.value)   toEl.value   = toDateStr(new Date());
+    if (fromEl && !fromEl.value) fromEl.value = toDateStr(new Date(Date.now() - 28 * 86400000));
+  }
+
+  // Pure markdown builder over a period — easy to unit-test.
+  function buildReportMarkdown(fromStr, toStr, notes, opts) {
+    opts = opts || {};
+    const s = periodSummary(fromStr, toStr, opts);
+    const name = opts.athleteName || loadSettings().athleteName || 'Athlete';
+    const benchData = opts.benchData || loadBenchData();
+    const ratio = s.pullPushRatio === null ? '∞' : ((s.pushSets || s.pullSets) ? `${s.pullPushRatio}:1` : '—');
+
+    const L = [];
+    L.push(`# Training Report — ${name}`);
+    L.push(`**Period:** ${fromStr} → ${toStr}`);
+    L.push('');
+    L.push('## Volume & strength');
+    L.push(`- Gym sessions: **${s.gymSessions}**`);
+    L.push(`- Total volume: **${s.tonnage.toLocaleString()} kg**`);
+    L.push(`- Pull : Push set ratio: **${ratio}** (${s.pullSets} pull / ${s.pushSets} push sets)`);
+    if (s.progressed.length) L.push(`- Progressed: ${s.progressed.join(', ')}`);
+    if (s.stalled.length)    L.push(`- Stalled (review): ${s.stalled.join(', ')}`);
+    L.push('');
+    L.push('## Engine');
+    L.push(`- Zone 2 sessions: **${s.engineSessions}**, total **${s.engineMinutes} min**`);
+    L.push('');
+    L.push('## Recovery adherence');
+    L.push(`- Mobility days: **${s.mobilityDays}**`);
+    L.push(`- Rehab days: **${s.rehabDays}**`);
+    L.push('');
+    L.push('## Benchmarks');
+    BENCHMARKS_DEF.forEach(def => {
+      const cur = benchData[def.id] != null ? benchData[def.id] : def.baseline;
+      const pct = Math.round(benchPct(def, cur));
+      L.push(`- ${def.name}: **${cur} ${def.unit}** (target ${def.target} — ${pct}%)`);
+    });
+    if (notes && notes.trim()) { L.push(''); L.push('## Notes'); L.push(notes.trim()); }
+    return L.join('\n');
+  }
+
+  function generateReport() {
+    const today        = toDateStr(new Date());
+    const fourWeeksAgo = toDateStr(new Date(Date.now() - 28 * 86400000));
+    const from  = document.getElementById('report-from')?.value || fourWeeksAgo;
+    const to    = document.getElementById('report-to')?.value   || today;
+    const notes = document.getElementById('report-notes')?.value || '';
+
+    _lastReport = buildReportMarkdown(from, to, notes);
+    const out = document.getElementById('report-output');
+    if (!out) return;
+    out.innerHTML = `<div class="card">
+      <div class="card-title">Report Preview</div>
+      <pre style="white-space:pre-wrap;font-size:13px;line-height:1.5;font-family:inherit;margin:0 0 12px">${_lastReport.replace(/</g,'&lt;')}</pre>
+      <button class="btn btn-secondary btn-full" onclick="copyReport()" style="margin-bottom:8px"><i class="fa-solid fa-copy"></i>&nbsp; Copy to clipboard</button>
+      <button class="btn btn-secondary btn-full" onclick="downloadReport()"><i class="fa-solid fa-download"></i>&nbsp; Download .md</button>
+    </div>`;
+  }
+
+  function copyReport() {
+    if (_lastReport && navigator.clipboard) navigator.clipboard.writeText(_lastReport);
+  }
+  function downloadReport() {
+    if (!_lastReport) return;
+    const blob = new Blob([_lastReport], { type:'text/markdown' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), { href:url, download:`coach-report-${toDateStr(new Date())}.md` });
+    a.click();
+    URL.revokeObjectURL(url);
   }
 

@@ -20,10 +20,12 @@
   };
 
   /* ─── STORAGE KEYS ──────────────────────────────────────────────── */
-  const KEY_SETTINGS = 'tt_settings';
-  const KEY_GYM      = 'tt_gym_sessions';
-  const KEY_MOB      = 'tt_mob_sessions';
-  const KEY_REHAB    = 'tt_rehab_sessions';
+  /* Canonical definitions live in store.js (KEYS). These aliases are kept
+     so existing references keep working; they point at the single source. */
+  const KEY_SETTINGS = KEYS.settings;
+  const KEY_GYM      = KEYS.gym;
+  const KEY_MOB      = KEYS.mob;
+  const KEY_REHAB    = KEYS.rehab;
 
   /* ─── SETTINGS ──────────────────────────────────────────────────── */
   const SETTING_DEFAULTS = {

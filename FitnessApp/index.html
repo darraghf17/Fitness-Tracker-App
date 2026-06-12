@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="css/app.css?v=4" />
+  <link rel="stylesheet" href="css/app.css?v=6" />
 </head>
 
 <body>
@@ -33,7 +33,10 @@
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-home" class="screen active">
 
-    <div class="dash-greeting"><span id="dash-greeting-text">Hi, Darragh</span></div>
+    <div style="position:relative">
+      <div class="dash-greeting"><span id="dash-greeting-text">Hi, Darragh</span></div>
+      <button class="home-gear" onclick="navigateTo('screen-settings')" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+    </div>
 
     <!-- Hero Card -->
     <div class="card hero-card">
@@ -98,6 +101,15 @@
     </div>
     <div id="gym-duration-banner" class="session-est" style="display:none"></div>
 
+    <!-- Rest timer -->
+    <div id="rest-timer" class="rest-timer">
+      <span class="rest-timer-label"><i class="fa-regular fa-clock"></i> Rest</span>
+      <button class="rest-btn" onclick="restTimerAdjust(-15)" aria-label="minus 15 seconds">−15</button>
+      <span id="rest-timer-display" class="rest-timer-display">1:30</span>
+      <button class="rest-btn" onclick="restTimerAdjust(15)" aria-label="plus 15 seconds">+15</button>
+      <button class="rest-btn rest-btn-go" id="rest-timer-toggle" onclick="restTimerToggle()">Start</button>
+    </div>
+
     <!-- Check-in -->
     <div class="card">
       <div class="card-title">Check-in</div>
@@ -145,6 +157,7 @@
     <div id="gym-exercise-list"></div>
 
     <div class="complete-wrap">
+      <div id="gym-save-feedback" style="display:none;margin-bottom:12px"></div>
       <button class="btn btn-full" id="btn-complete-session" style="background:var(--success);color:#fff;font-size:16px;padding:16px;border-radius:var(--radius-btn)">
         <i class="fa-solid fa-check-circle"></i> Complete Session
       </button>
@@ -155,6 +168,11 @@
        SCREEN 3 — MOBILITY PROGRAMME
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-mobility" class="screen">
+
+    <div class="subtab-bar">
+      <button class="subtab active" onclick="navigateTo('screen-mobility')">Mobility</button>
+      <button class="subtab" onclick="navigateTo('screen-rehab')">Rehab</button>
+    </div>
 
     <!-- Amber warning banner (11 pm – midnight) -->
     <div id="mob-warning-banner" class="mob-amber-banner" style="display:none">
@@ -189,10 +207,19 @@
        SCREEN 4 — PROGRESS / BENCHMARKS
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-progress" class="screen">
-    <div class="screen-header">
-      <h1>Progress</h1>
-      <p>Benchmarks &amp; performance tracking</p>
+    <div class="subtab-bar">
+      <button class="subtab active" onclick="navigateTo('screen-progress')">Overview</button>
+      <button class="subtab" onclick="navigateTo('screen-overload')">Overload</button>
+      <button class="subtab" onclick="navigateTo('screen-report')">Report</button>
     </div>
+
+    <div class="screen-header">
+      <h1>Insights</h1>
+      <p>Benchmarks &amp; weekly load</p>
+    </div>
+
+    <!-- Unified weekly load (all modalities) -->
+    <div id="weekly-load-card"></div>
 
     <!-- Resting HR -->
     <div class="card hr-logger-card">
@@ -225,6 +252,12 @@
        SCREEN 5 — OVERLOAD TRACKING
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-overload" class="screen">
+    <div class="subtab-bar">
+      <button class="subtab" onclick="navigateTo('screen-progress')">Overview</button>
+      <button class="subtab active" onclick="navigateTo('screen-overload')">Overload</button>
+      <button class="subtab" onclick="navigateTo('screen-report')">Report</button>
+    </div>
+
     <div class="screen-header">
       <h1>Overload Tracking</h1>
       <p>Progressive overload for every lift</p>
@@ -279,6 +312,12 @@
        SCREEN 6 — COACH REPORT
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-report" class="screen">
+    <div class="subtab-bar">
+      <button class="subtab" onclick="navigateTo('screen-progress')">Overview</button>
+      <button class="subtab" onclick="navigateTo('screen-overload')">Overload</button>
+      <button class="subtab active" onclick="navigateTo('screen-report')">Report</button>
+    </div>
+
     <div class="screen-header">
       <h1>Coach Report</h1>
       <p>Auto-generated summary for your coach</p>
@@ -305,11 +344,13 @@
     </div>
 
     <div style="padding:8px 0 16px">
-      <button class="btn btn-full" id="btn-generate-report"
+      <button class="btn btn-full" id="btn-generate-report" onclick="generateReport()"
         style="background:var(--success);color:#fff;font-size:16px;padding:16px;border-radius:var(--radius-btn)">
         <i class="fa-solid fa-file-export"></i>&nbsp; Generate Report
       </button>
     </div>
+
+    <div id="report-output"></div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════
@@ -357,6 +398,11 @@
        SCREEN 8 — DAILY REHAB
   ══════════════════════════════════════════════════════════════ -->
   <section id="screen-rehab" class="screen">
+    <div class="subtab-bar">
+      <button class="subtab" onclick="navigateTo('screen-mobility')">Mobility</button>
+      <button class="subtab active" onclick="navigateTo('screen-rehab')">Rehab</button>
+    </div>
+
     <div class="screen-header">
       <h1>Daily Rehab</h1>
       <p>Every day · ~10 min · ankle rehabilitation</p>
@@ -395,27 +441,17 @@
     </button>
     <button class="nav-tab" data-target="screen-gym">
       <i class="fa-solid fa-dumbbell"></i>
-      <span class="nav-label">Gym</span>
+      <span class="nav-label">Train</span>
       <span class="nav-dot"></span>
     </button>
     <button class="nav-tab" data-target="screen-mobility">
       <i class="fa-solid fa-person-running"></i>
-      <span class="nav-label">Mobility</span>
+      <span class="nav-label">Recovery</span>
       <span class="nav-dot"></span>
     </button>
     <button class="nav-tab" data-target="screen-progress">
       <i class="fa-solid fa-chart-line"></i>
-      <span class="nav-label">Progress</span>
-      <span class="nav-dot"></span>
-    </button>
-    <button class="nav-tab" data-target="screen-overload">
-      <i class="fa-solid fa-arrow-trend-up"></i>
-      <span class="nav-label">Overload</span>
-      <span class="nav-dot"></span>
-    </button>
-    <button class="nav-tab" data-target="screen-report">
-      <i class="fa-solid fa-file-lines"></i>
-      <span class="nav-label">Report</span>
+      <span class="nav-label">Insights</span>
       <span class="nav-dot"></span>
     </button>
     <button class="nav-tab" data-target="screen-calendar">
@@ -423,22 +459,20 @@
       <span class="nav-label">Calendar</span>
       <span class="nav-dot"></span>
     </button>
-    <button class="nav-tab" data-target="screen-settings">
-      <i class="fa-solid fa-gear"></i>
-      <span class="nav-label">Settings</span>
-      <span class="nav-dot"></span>
-    </button>
   </nav>
 
 </div><!-- /#app -->
 
-<script src="js/data.js?v=4"></script>
-<script src="js/utils.js?v=4"></script>
-<script src="js/gym.js?v=4"></script>
-<script src="js/mobility.js?v=6"></script>
-<script src="js/rehab.js?v=4"></script>
-<script src="js/progress.js?v=4"></script>
+<script src="js/store.js?v=1"></script>
+<script src="js/data.js?v=5"></script>
+<script src="js/utils.js?v=7"></script>
+<script src="js/checklist.js?v=1"></script>
+<script src="js/gym.js?v=6"></script>
+<script src="js/mobility.js?v=7"></script>
+<script src="js/rehab.js?v=5"></script>
+<script src="js/progress.js?v=7"></script>
+<script src="js/metrics.js?v=2"></script>
 <script src="js/calendar.js?v=4"></script>
-<script src="js/main.js?v=4"></script>
+<script src="js/main.js?v=8"></script>
 </body>
 </html>

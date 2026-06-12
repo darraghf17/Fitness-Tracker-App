@@ -1,6 +1,6 @@
 
   /* ─── DAILY REHAB DATA ───────────────────────────────────────────── */
-  const KEY_REHAB_PROG = 'tt_rehab_prog';
+  const KEY_REHAB_PROG = KEYS.rehabProg;
 
   const REHAB_EXERCISES = [
     {
@@ -35,59 +35,23 @@
     }
   ];
 
-  /* ─── STORAGE HELPERS ────────────────────────────────────────────── */
-  function getRehabTicks(dateStr) {
-    try {
-      const stored = JSON.parse(localStorage.getItem(KEY_REHAB_PROG) || '{}');
-      if (stored.date === dateStr) return stored.ticks || {};
-    } catch {}
-    return {};
-  }
+  /* ─── CHECKLIST ENGINE WIRING ────────────────────────────────────── */
+  const _rehabChecklist = createChecklist({
+    progKey:        KEY_REHAB_PROG,
+    sessionKey:     KEY_REHAB,
+    sessionRecord:  dateStr => ({ date: dateStr }),
+    getItemIds:     () => REHAB_EXERCISES.map(e => e.id),
+    rowSelector:    id => `[data-rehab-id="${id}"]`,
+    doneClass:      'rehab-ex-done',
+    progressTextId: 'rehab-progress-text',
+    progressFillId: 'rehab-progress-fill',
+    formatProgress: (done, total) => `${done} of ${total} completed`,
+  });
 
-  function _persistRehabTick(exId, checked, dateStr) {
-    const ticks = getRehabTicks(dateStr);
-    ticks[exId] = checked;
-    localStorage.setItem(KEY_REHAB_PROG, JSON.stringify({ date: dateStr, ticks }));
-  }
-
-  function _saveRehabSessionRecord(dateStr) {
-    const sessions = loadSessions(KEY_REHAB);
-    if (!sessions.some(s => s.date === dateStr)) {
-      sessions.push({ date: dateStr });
-      localStorage.setItem(KEY_REHAB, JSON.stringify(sessions));
-    }
-  }
-
-  /* ─── STATE UPDATES ──────────────────────────────────────────────── */
-  function toggleRehabTick(exId, dateStr) {
-    const ticks = getRehabTicks(dateStr);
-    _persistRehabTick(exId, !ticks[exId], dateStr);
-    updateRehabProgress(dateStr);
-
-    const row = document.querySelector(`[data-rehab-id="${exId}"]`);
-    if (row) {
-      const checked = !ticks[exId];
-      const cb = row.querySelector('.mob-checkbox');
-      if (cb) cb.classList.toggle('checked', checked);
-      row.classList.toggle('rehab-ex-done', checked);
-    }
-  }
-
-  function updateRehabProgress(dateStr) {
-    const ticks = getRehabTicks(dateStr);
-    const done  = REHAB_EXERCISES.filter(e => ticks[e.id]).length;
-    const total = REHAB_EXERCISES.length;
-
-    const textEl = document.getElementById('rehab-progress-text');
-    const fillEl = document.getElementById('rehab-progress-fill');
-    if (textEl) textEl.textContent = `${done} of ${total} completed`;
-    if (fillEl) fillEl.style.width = `${Math.round((done / total) * 100)}%`;
-
-    if (done === total) {
-      _saveRehabSessionRecord(dateStr);
-      renderDashboard();
-    }
-  }
+  // Global wrappers — referenced from row onclick / builders.
+  function getRehabTicks(dateStr)      { return _rehabChecklist.getTicks(dateStr); }
+  function toggleRehabTick(exId, date) { _rehabChecklist.toggle(exId, date); }
+  function updateRehabProgress(date)   { _rehabChecklist.updateProgress(date); }
 
   /* ─── ROW BUILDER ────────────────────────────────────────────────── */
   function buildRehabExRow(ex, dateStr) {
@@ -124,17 +88,9 @@
   /* ─── MAIN RENDER ────────────────────────────────────────────────── */
   function renderRehabLogger() {
     const dateStr = toDateStr(new Date());
-    const ticks   = getRehabTicks(dateStr);
-    const done    = REHAB_EXERCISES.filter(e => ticks[e.id]).length;
-    const total   = REHAB_EXERCISES.length;
-
-    const textEl = document.getElementById('rehab-progress-text');
-    const fillEl = document.getElementById('rehab-progress-fill');
-    if (textEl) textEl.textContent = `${done} of ${total} completed`;
-    if (fillEl) fillEl.style.width = `${Math.round((done / total) * 100)}%`;
-
     const list = document.getElementById('rehab-exercise-list');
     if (list) {
       list.innerHTML = REHAB_EXERCISES.map(ex => buildRehabExRow(ex, dateStr)).join('');
     }
+    updateRehabProgress(dateStr);
   }
