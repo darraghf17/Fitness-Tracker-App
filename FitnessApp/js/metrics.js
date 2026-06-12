@@ -153,6 +153,43 @@
     'b-wristr': { exIds: ['ua-wrist', 'ub-wrist', 'ep-wrist', 'uc-wrist'], metric: 'weight' },
   };
 
+  /* ─── Period summary (for the coach report) ────────────────────── */
+  function periodSummary(fromStr, toStr, opts) {
+    opts = opts || {};
+    const inR = s => s.date >= fromStr && s.date <= toStr;
+    const gym   = (opts.gym   || loadSessions(KEY_GYM)).filter(inR);
+    const mob   = (opts.mob   || loadSessions(KEY_MOB)).filter(inR);
+    const rehab = (opts.rehab || loadSessions(KEY_REHAB)).filter(inR);
+
+    let tonnage = 0, pullSets = 0, pushSets = 0, engineMinutes = 0, engineSessions = 0;
+    const progressed = new Set(), stalled = new Set();
+
+    gym.forEach(s => {
+      tonnage += sessionTonnage(s);
+      (s.exercises || []).forEach(ex => {
+        const n = (ex.sets || []).filter(st => parseInt(st.reps) > 0).length;
+        if (exCategory(ex.id) === 'pull') pullSets += n;
+        else if (exCategory(ex.id) === 'push') pushSets += n;
+        if (ex.progressionFlag) progressed.add(ex.name);
+        if (ex.stallFlag) stalled.add(ex.name);
+      });
+      if (s.zone2 && s.zone2.duration) { engineMinutes += parseInt(s.zone2.duration) || 0; engineSessions++; }
+    });
+
+    return {
+      from: fromStr, to: toStr,
+      gymSessions: gym.length,
+      tonnage,
+      pullSets, pushSets,
+      pullPushRatio: pushSets > 0 ? +(pullSets / pushSets).toFixed(1) : (pullSets > 0 ? null : 0),
+      engineMinutes, engineSessions,
+      mobilityDays: new Set(mob.map(s => s.date)).size,
+      rehabDays: new Set(rehab.map(s => s.date)).size,
+      progressed: [...progressed],
+      stalled: [...stalled],
+    };
+  }
+
   // Best logged value for a benchmark, or null if nothing applies.
   function derivedBenchmark(benchId, gym) {
     const cfg = BENCH_DERIVE[benchId];

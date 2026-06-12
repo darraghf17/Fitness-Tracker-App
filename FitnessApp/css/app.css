@@ -994,3 +994,40 @@
       padding: 12px 14px;
     }
     .rehab-how-text { font-size: 14px; color: var(--text); line-height: 1.65; margin: 0; }
+
+    /* ── Sub-tab bars (Recovery / Insights screen groups) ── */
+    .subtab-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      background: var(--card);
+      padding: 4px;
+      border-radius: var(--radius-btn);
+      box-shadow: var(--shadow);
+    }
+    .subtab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 8px;
+      border-radius: var(--radius-input);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sec);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .subtab.active { background: var(--primary); color: #fff; }
+
+    /* Settings gear on the home hero */
+    .home-gear {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
+      color: var(--text-sec);
+      font-size: 20px;
+      padding: 6px;
+      cursor: pointer;
+    }

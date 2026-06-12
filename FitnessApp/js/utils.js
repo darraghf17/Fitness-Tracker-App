@@ -62,18 +62,37 @@
   }
 
   /* ─── NAVIGATION ────────────────────────────────────────────────── */
+  // Several screens share one bottom-nav tab (Recovery groups mobility+rehab;
+  // Insights groups progress+overload+report; settings keeps Home lit). This
+  // maps a screen to the tab that should highlight while it's open.
+  const NAV_GROUP = {
+    'screen-home':     'screen-home',
+    'screen-gym':      'screen-gym',
+    'screen-mobility': 'screen-mobility',
+    'screen-rehab':    'screen-mobility',
+    'screen-progress': 'screen-progress',
+    'screen-overload': 'screen-progress',
+    'screen-report':   'screen-progress',
+    'screen-calendar': 'screen-calendar',
+    'screen-settings': 'screen-home',
+  };
+
   function navigateTo(screenId) {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const tab = document.querySelector(`.nav-tab[data-target="${screenId}"]`);
+    const tab = document.querySelector(`.nav-tab[data-target="${NAV_GROUP[screenId] || screenId}"]`);
     if (tab) tab.classList.add('active');
     const scr = document.getElementById(screenId);
     if (scr) scr.classList.add('active');
+    window.scrollTo(0, 0);
+    if (screenId === 'screen-home')     renderDashboard();
     if (screenId === 'screen-gym')      renderGymLogger();
     if (screenId === 'screen-mobility') renderMobilityLogger();
     if (screenId === 'screen-rehab')    renderRehabLogger();
     if (screenId === 'screen-progress') renderProgress();
     if (screenId === 'screen-overload') renderOverload();
+    if (screenId === 'screen-report')   renderReport();
+    if (screenId === 'screen-settings') renderSettings();
     if (screenId === 'screen-calendar') renderCalendar();
   }
 

@@ -403,3 +403,82 @@
     if (detail)  detail.textContent = `${pull} pulling sets : ${push} pushing sets${push > 0 ? ` — ratio ${ratio}:1` : ''}`;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     COACH REPORT
+  ═══════════════════════════════════════════════════════════════════ */
+  let _lastReport = '';
+
+  // Default the date range to the last 4 weeks when the screen opens.
+  function renderReport() {
+    const fromEl = document.getElementById('report-from');
+    const toEl   = document.getElementById('report-to');
+    if (toEl && !toEl.value)   toEl.value   = toDateStr(new Date());
+    if (fromEl && !fromEl.value) fromEl.value = toDateStr(new Date(Date.now() - 28 * 86400000));
+  }
+
+  // Pure markdown builder over a period — easy to unit-test.
+  function buildReportMarkdown(fromStr, toStr, notes, opts) {
+    opts = opts || {};
+    const s = periodSummary(fromStr, toStr, opts);
+    const name = opts.athleteName || loadSettings().athleteName || 'Athlete';
+    const benchData = opts.benchData || loadBenchData();
+    const ratio = s.pullPushRatio === null ? '∞' : ((s.pushSets || s.pullSets) ? `${s.pullPushRatio}:1` : '—');
+
+    const L = [];
+    L.push(`# Training Report — ${name}`);
+    L.push(`**Period:** ${fromStr} → ${toStr}`);
+    L.push('');
+    L.push('## Volume & strength');
+    L.push(`- Gym sessions: **${s.gymSessions}**`);
+    L.push(`- Total volume: **${s.tonnage.toLocaleString()} kg**`);
+    L.push(`- Pull : Push set ratio: **${ratio}** (${s.pullSets} pull / ${s.pushSets} push sets)`);
+    if (s.progressed.length) L.push(`- Progressed: ${s.progressed.join(', ')}`);
+    if (s.stalled.length)    L.push(`- Stalled (review): ${s.stalled.join(', ')}`);
+    L.push('');
+    L.push('## Engine');
+    L.push(`- Zone 2 sessions: **${s.engineSessions}**, total **${s.engineMinutes} min**`);
+    L.push('');
+    L.push('## Recovery adherence');
+    L.push(`- Mobility days: **${s.mobilityDays}**`);
+    L.push(`- Rehab days: **${s.rehabDays}**`);
+    L.push('');
+    L.push('## Benchmarks');
+    BENCHMARKS_DEF.forEach(def => {
+      const cur = benchData[def.id] != null ? benchData[def.id] : def.baseline;
+      const pct = Math.round(benchPct(def, cur));
+      L.push(`- ${def.name}: **${cur} ${def.unit}** (target ${def.target} — ${pct}%)`);
+    });
+    if (notes && notes.trim()) { L.push(''); L.push('## Notes'); L.push(notes.trim()); }
+    return L.join('\n');
+  }
+
+  function generateReport() {
+    const today        = toDateStr(new Date());
+    const fourWeeksAgo = toDateStr(new Date(Date.now() - 28 * 86400000));
+    const from  = document.getElementById('report-from')?.value || fourWeeksAgo;
+    const to    = document.getElementById('report-to')?.value   || today;
+    const notes = document.getElementById('report-notes')?.value || '';
+
+    _lastReport = buildReportMarkdown(from, to, notes);
+    const out = document.getElementById('report-output');
+    if (!out) return;
+    out.innerHTML = `<div class="card">
+      <div class="card-title">Report Preview</div>
+      <pre style="white-space:pre-wrap;font-size:13px;line-height:1.5;font-family:inherit;margin:0 0 12px">${_lastReport.replace(/</g,'&lt;')}</pre>
+      <button class="btn btn-secondary btn-full" onclick="copyReport()" style="margin-bottom:8px"><i class="fa-solid fa-copy"></i>&nbsp; Copy to clipboard</button>
+      <button class="btn btn-secondary btn-full" onclick="downloadReport()"><i class="fa-solid fa-download"></i>&nbsp; Download .md</button>
+    </div>`;
+  }
+
+  function copyReport() {
+    if (_lastReport && navigator.clipboard) navigator.clipboard.writeText(_lastReport);
+  }
+  function downloadReport() {
+    if (!_lastReport) return;
+    const blob = new Blob([_lastReport], { type:'text/markdown' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), { href:url, download:`coach-report-${toDateStr(new Date())}.md` });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+

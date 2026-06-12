@@ -144,12 +144,9 @@
 
   /* ─── INIT ──────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
+    // navigateTo handles the per-screen render (including home & settings).
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        navigateTo(tab.dataset.target);
-        if (tab.dataset.target === 'screen-home')     renderDashboard();
-        if (tab.dataset.target === 'screen-settings') renderSettings();
-      });
+      tab.addEventListener('click', () => navigateTo(tab.dataset.target));
     });
     initSettings();
     initGymLogger();
