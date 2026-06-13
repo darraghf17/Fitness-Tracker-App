@@ -63,15 +63,15 @@
   };
 
 
-  /* Physio-locked deeper work per day (shown greyed/padlocked until physio toggle on) */
+  /* Deeper work per day */
   const MOB_LOCKED_DEEPER = {
-    1: [{ id:'mob-l1', name:'Knee-to-wall ankle drill', target:'2 × 10 reps/side', rationale:'After physio clearance — ankle mobility work after an upper gym day' }],
+    1: [{ id:'mob-l1', name:'Knee-to-wall ankle drill', target:'2 × 10 reps/side', rationale:'Ankle mobility work after an upper gym day' }],
     3: [{ id:'mob-l1', name:'Knee-to-wall ankle drill', target:'2 × 10 reps/side', rationale:'Second ankle session of the week after an upper gym day' }],
     5: [{ id:'mob-l1', name:'Knee-to-wall ankle drill', target:'2 × 10 reps/side', rationale:'Third ankle session of the week — three sessions weekly for the 3 cm dorsiflexion deficit' }],
-    2: [{ id:'mob-l2', name:'Eccentric heel drop', target:'3 × 15 reps/side', rationale:'After physio clearance — Achilles and calf eccentric work on an engine day' }],
+    2: [{ id:'mob-l2', name:'Eccentric heel drop', target:'3 × 15 reps/side', rationale:'Achilles and calf eccentric work on an engine day' }],
     4: [{ id:'mob-l2', name:'Eccentric heel drop', target:'3 × 15 reps/side', rationale:'Second eccentric heel drop session of the week' }],
     6: [
-      { id:'mob-l3', name:'Wall angel', target:'2 × 10 reps',    rationale:'After physio clearance — thoracic mobility with posterior chain activation on rest day' },
+      { id:'mob-l3', name:'Wall angel', target:'2 × 10 reps',    rationale:'Thoracic mobility with posterior chain activation on rest day' },
       { id:'mob-l4', name:'Loaded thoracic extension', target:'2 × 60s', rationale:'Loaded thoracic extension on rest day — no gym fatigue' },
     ],
     0: [
@@ -784,7 +784,7 @@
       }
     },
 
-    /* ── LOCKED EXERCISES (physio-cleared) ─────────────────────────── */
+    /* ── DEEPER EXERCISES ──────────────────────────────────────────── */
     'mob-l1': {
       svg: `<svg viewBox="0 0 300 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
   <defs><marker id="arl1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#e74c3c"/></marker></defs>
@@ -849,7 +849,7 @@
         'Lower as far as the ankle will comfortably allow. Do not rush the descent.',
         'At the bottom, use both feet to rise back to the top (reduce the load for the concentric phase).',
         'That is one rep. Complete all reps on one side before switching.',
-        'Begin with bodyweight only. Progress to holding a light weight only when physio advises.'
+        'Begin with bodyweight only. Progress to holding a light weight only once cleared to do so.'
       ],
       feel: 'You should feel the calf and Achilles tendon working hard during the slow lowering phase. A deep ache in the calf belly and a stretch through the Achilles at the bottom is expected and correct. This is a loading exercise, not a passive stretch. No sharp pain at the heel, no sharp ankle joint pain. This exercise is specifically for proximal hamstring and Achilles tendon resilience — progress slowly.',
       prog: {
@@ -967,7 +967,7 @@
         'Ensure the spine stays neutral — do not lean to the side or arch the lower back to achieve apparent range.',
         'Release the overpressure and lower the arm. Rest 30 seconds. Repeat for the prescribed sets.'
       ],
-      feel: 'You should feel the shoulder joint at its true end range — a sense of the joint stopping rather than the muscle stretching. Some deep shoulder girdle stretch is expected. This is a post-physio-clearance exercise that addresses the overhead reach restriction diagnosed in your assessment. No sharp pain. No pinching at the front of the shoulder. If either of these occur, stop immediately.',
+      feel: 'You should feel the shoulder joint at its true end range — a sense of the joint stopping rather than the muscle stretching. Some deep shoulder girdle stretch is expected. This exercise addresses the overhead reach restriction diagnosed in your assessment. No sharp pain. No pinching at the front of the shoulder. If either of these occur, stop immediately.',
       prog: {
         ready: 'The left shoulder reaches the same overhead height as the right with no overpressure required, the end range feels soft (muscle) rather than hard (joint), and you can hold 30 seconds with relaxed breathing.',
         next: 'Progress to a standing wall slide — raise the left arm up a wall surface to track the range improvement objectively. Measure the height reached on the wall monthly.',
@@ -1073,7 +1073,7 @@
       feel: 'A deep stretch low in the calf — lower than a straight-leg calf stretch. Some pull toward the Achilles tendon area.',
       prog: {
         ready: 'Knee tracks to the wall with 5+ cm between the toe and wall, heel stays flat, no calf tightness limiting range.',
-        next: 'Progress to 3 sets. Add eccentric heel drops (after physio clearance) to complement the passive stretch.',
+        next: 'Progress to 3 sets. Add eccentric heel drops once cleared to complement the passive stretch.',
         goal: 'Symmetrical dorsiflexion — 10+ cm knee-to-wall test on both sides, resolving the 3 cm bilateral deficit.',
         time: '6–8 weeks combined with ankle drills for the dorsiflexion restriction.'
       }

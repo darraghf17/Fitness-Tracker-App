@@ -7,12 +7,7 @@
   const _CDNS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
   function calBlock(dateStr, sett) {
-    const d = new Date(dateStr + 'T00:00:00');
-    if (d <= new Date('2026-06-08T23:59:59')) return 'Block 1';
-    if (d >= new Date('2026-07-27T00:00:00')) return 'Block 3';
-    if (sett.block === 'Block 2A') return 'Block 2A';
-    if (sett.block === 'Block 2B') return 'Block 2B';
-    return null; // pathway not set
+    return sett.block || getAutoBlock(dateStr);
   }
 
   function calDayType(dateStr, sett) {
@@ -20,10 +15,6 @@
     const blk = calBlock(dateStr, sett);
     const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const dn  = DAY[d.getDay()];
-    if (blk === null) {
-      if (dn === 'Tue') return 'pathway-not-set';
-      return (BLOCK_SCHEDULES['Block 2B'] || {})[dn] || 'Rest';
-    }
     return (BLOCK_SCHEDULES[blk] || BLOCK_SCHEDULES['Block 1'])[dn] || 'Rest';
   }
 
@@ -36,12 +27,10 @@
   }
 
   function calPill(dayType) {
-    if (dayType === 'pathway-not-set')
-      return '<span class="cal-session-pill pill-pathway">?</span>';
     if (dayType === 'Rest')
       return '<span class="cal-session-pill pill-rest">Rest</span>';
     if (dayType === 'Lower')
-      return '<span class="cal-session-pill pill-lower">Lower — Cleared</span>';
+      return '<span class="cal-session-pill pill-lower">Lower</span>';
     if (dayType.startsWith('Upper'))
       return `<span class="cal-session-pill pill-upper">${dayType.replace(' + Climbing','')}</span>`;
     if (dayType.startsWith('Engine'))
@@ -55,7 +44,7 @@
     const isToday = dateStr === todayStr;
     const isPast  = dateStr < todayStr;
     const dateLabel = `${_CDNS[d.getDay()]} ${d.getDate()} ${_CMNS[d.getMonth()]}`;
-    const isGymDay  = !['Rest','pathway-not-set'].includes(dayType);
+    const isGymDay  = dayType !== 'Rest';
 
     let statusBadge = '';
     if (isPast && isGymDay) {
@@ -70,10 +59,8 @@
     let body = '';
     if (dayType === 'Rest') {
       body = '<div class="cal-rest-text">Rest day — prioritise sleep, nutrition, and the daily mobility routine.</div>';
-    } else if (dayType === 'pathway-not-set') {
-      body = '<div class="cal-pathway-warn">Pathway not set — update in Settings after your physio appointment on 9 June to see the correct Tuesday session.</div>';
     } else {
-      const blk = calBlock(dateStr, sett) || 'Block 2B';
+      const blk = calBlock(dateStr, sett);
       body = `<div class="cal-ex-ph" data-date="${dateStr}" data-daytype="${dayType}" data-block="${blk}" data-past="${isPast}" data-loaded="false"></div>`;
     }
 
